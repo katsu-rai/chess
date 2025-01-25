@@ -1,8 +1,11 @@
 package chess;
 
+import chess.pieces.PieceMoveCalculator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import chess.pieces.*;
 
 /**
  * Represents a single chess piece
@@ -54,7 +57,30 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        Collection<ChessMove> result = new ArrayList<>();
+        switch (pieceType) {
+            case KING:
+                result = King.getMoves(board, myPosition);
+                break;
+            case QUEEN:
+                result = Queen.getMoves(board, myPosition);
+                break;
+            case BISHOP:
+                result = Bishop.getMoves(board, myPosition);
+                break;
+            case KNIGHT:
+                result = Knight.getMoves(board, myPosition);
+                break;
+            case ROOK:
+                result = Rook.getMoves(board, myPosition);
+                break;
+            case PAWN:
+                result = Pawn.getMoves(board, myPosition);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected value: " + pieceType);
+        }
+        return result;
     }
 
     @Override

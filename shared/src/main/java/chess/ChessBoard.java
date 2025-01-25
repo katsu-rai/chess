@@ -27,6 +27,13 @@ public class ChessBoard {
         squares[position.getColumn()-1][position.getRow()-1] = piece;
     }
 
+    public ChessGame.TeamColor getTeam(ChessPosition position) {
+        if (getPiece(position) != null) {
+            return getPiece(position).getTeamColor();
+        }
+        else return null;
+    }
+
     /**
      * Gets a chess piece on the chessboard
      *
