@@ -10,10 +10,10 @@ import java.util.Arrays;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] squares;
+    private ChessPiece[][] board;
 
     public ChessBoard() {
-        squares = new ChessPiece[8][8];
+        board = new ChessPiece[8][8];
     }
 
     /**
@@ -24,7 +24,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         //Minus one to account for arrays starting at 0
-        squares[position.getColumn()-1][position.getRow()-1] = piece;
+        board[position.getColumn()-1][position.getRow()-1] = piece;
     }
 
     public ChessGame.TeamColor getTeam(ChessPosition position) {
@@ -43,7 +43,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         //Minus one to account for arrays starting at 0
-        return squares[position.getColumn()-1][position.getRow()-1];
+        return board[position.getColumn()-1][position.getRow()-1];
     }
 
     /**
@@ -51,7 +51,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        squares = new ChessPiece[8][8];
+        board = new ChessPiece[8][8];
 
         //Add all white pieces
         addPiece(new ChessPosition(1, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
@@ -83,15 +83,12 @@ public class ChessBoard {
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        for (int col = 7; col >= 0; col--) {
-            output.append("|");
-            for (int row = 0; row < 8; row++) {
-                output.append(
-                        squares[row][col] != null ? squares[row][col].toString() : " "
-                );
-                output.append("|");
+        for (int row = 0; row < 8; row ++) {
+            output.append('|');
+            for (int col = 0; col < 8; col ++){
+                output.append(getTeam(new ChessPosition(row, col)) != null ? getPiece(new ChessPosition(row, col)) : ' ');
             }
-            output.append("\n");
+            output.append("|\n");
         }
         return output.toString();
     }
@@ -105,11 +102,11 @@ public class ChessBoard {
             return false;
 
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(squares, that.squares);
+        return Arrays.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(squares);
+        return Arrays.deepHashCode(board);
     }
 }

@@ -10,13 +10,13 @@ import java.util.HashSet;
 
 public interface PieceMoveCalculator {
 
-    static boolean isValid(ChessPosition position) {
+    static boolean IsValid(ChessPosition position) {
         int row = position.getRow();
         int column = position.getColumn();
         return row >= 1 && row <= 8 && column >= 1 && column <= 8;
     }
 
-    static HashSet<ChessMove> StaticMoves(ChessPosition startPosition, int[][] offsetMoves, ChessBoard chessBoard) {
+    static HashSet<ChessMove> StaticMoves(ChessPosition startPosition, int[][] possibleMoves, ChessBoard chessBoard) {
         HashSet<ChessMove> maxMoves = new HashSet<>(8);
 
         int startCol = startPosition.getColumn();
@@ -24,13 +24,13 @@ public interface PieceMoveCalculator {
 
         ChessGame.TeamColor playerTeam = chessBoard.getTeam(startPosition);
 
-        for (int[] offset : offsetMoves) {
-            int targetRow = startRow + offset[1];
-            int targetCol = startCol + offset[0];
+        for (int[] possibleMove : possibleMoves) {
+            int targetRow = startRow + possibleMove[1];
+            int targetCol = startCol + possibleMove[0];
 
             ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
 
-            if (isValid(targetPosition) && chessBoard.getTeam(targetPosition) != playerTeam) {
+            if (IsValid(targetPosition) && chessBoard.getTeam(targetPosition) != playerTeam) {
                 maxMoves.add(new ChessMove(startPosition, targetPosition, null));
             }
         }
@@ -38,7 +38,7 @@ public interface PieceMoveCalculator {
         return maxMoves;
     }
 
-    static HashSet<ChessMove> DirectionalSteps(ChessBoard chessBoard, ChessPosition startPosition, int[][] directions, int startRow, int startCol, ChessGame.TeamColor playerTeam) {
+    static HashSet<ChessMove> DynamicMoves(ChessBoard chessBoard, ChessPosition startPosition, int[][] directions, int startRow, int startCol, ChessGame.TeamColor playerTeam) {
         HashSet<ChessMove> directionalMoves = new HashSet<>(27); // Allocate for larger sets of moves
 
         for (int[] direction : directions) {
@@ -51,7 +51,7 @@ public interface PieceMoveCalculator {
 
                 ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
 
-                if (!isValid(targetPosition)) {
+                if (!IsValid(targetPosition)) {
                     stopSearch = true;
                 } else if (chessBoard.getPiece(targetPosition) == null) {
                     directionalMoves.add(new ChessMove(startPosition, targetPosition, null));

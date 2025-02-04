@@ -20,27 +20,27 @@ public class Pawn implements PieceMoveCalculator {
         for (ChessPiece.PieceType promotionPiece : promotionPieces) {
 
             ChessPosition secondFrontStep = new ChessPosition(currRow + moveIncrement, currCol);
-            if (PieceMoveCalculator.isValid(secondFrontStep)
+            if (PieceMoveCalculator.IsValid(secondFrontStep)
                     && board.getPiece(secondFrontStep) == null) {
                 moves.add(new ChessMove(currPosition, secondFrontStep, promotionPiece));
             }
 
             ChessPosition leftAttack = new ChessPosition(currRow + moveIncrement, currCol-1);
-            if (PieceMoveCalculator.isValid(leftAttack)
+            if (PieceMoveCalculator.IsValid(leftAttack)
                     && board.getPiece(leftAttack) != null
                     && board.getTeam(leftAttack) != team) {
                 moves.add(new ChessMove(currPosition, leftAttack, promotionPiece));
             }
             ChessPosition rightAttack = new ChessPosition(currRow + moveIncrement, currCol+1);
 
-            if (PieceMoveCalculator.isValid(rightAttack)
+            if (PieceMoveCalculator.IsValid(rightAttack)
                     && board.getPiece(rightAttack) != null
                     && board.getTeam(rightAttack) != team) {
                 moves.add(new ChessMove(currPosition, rightAttack, promotionPiece));
             }
 
             ChessPosition doubleForwardPosition = new ChessPosition(currRow + moveIncrement*2, currCol);
-            if (PieceMoveCalculator.isValid(doubleForwardPosition)
+            if (PieceMoveCalculator.IsValid(doubleForwardPosition)
                     && ((team == ChessGame.TeamColor.WHITE && currRow == 2)
                     || (team == ChessGame.TeamColor.BLACK && currRow == 7))
                     && board.getPiece(doubleForwardPosition) == null
