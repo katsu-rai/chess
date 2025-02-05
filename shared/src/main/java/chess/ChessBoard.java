@@ -109,4 +109,10 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(board);
     }
+
+    public ChessBoard copy() {
+        ChessBoard boardCopy = new ChessBoard();
+        boardCopy.board = board.clone();
+        return boardCopy;
+    }
 }

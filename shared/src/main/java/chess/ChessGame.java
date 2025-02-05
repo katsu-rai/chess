@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -48,11 +50,25 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        if(board.getPiece(startPosition) == null){
-            return null;
+        ChessPiece piece = board.getPiece(startPosition);
+        if(piece == null){
+            return Collections.emptyList();
         } else {
+            Collection<ChessMove> actualMoves = new ArrayList<ChessMove>();
             Collection<ChessMove> possibleMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
-            return possibleMoves;
+            for (ChessMove move : possibleMoves) {
+                ChessBoard boardCopy = board.copy();
+                ChessGame.TeamColor teamColor = piece.getTeamColor();
+
+               boardCopy.addPiece(startPosition, null);
+               boardCopy.addPiece(move.getEndPosition(), piece);
+
+               if(!isInCheck(teamColor)){
+                   actualMoves.add(move);
+               }
+            }
+
+            return actualMoves;
         }
     }
 
@@ -73,7 +89,44 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = null;
+        outloop:
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                if (piece != null
+                        && piece.getPieceType() == ChessPiece.PieceType.KING
+                        && piece.getTeamColor() == teamColor) {
+                    kingPosition = new ChessPosition(row, col);
+                    break outloop;
+                }
+            }
+        }
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                if(board.getPiece(new ChessPosition(row, col)) != null
+                        && board.getPiece(new ChessPosition(row, col)).getTeamColor() == teamColor) {
+                    continue;
+                } else {
+                    ChessPiece enemyPiece = board.getPiece(new ChessPosition(row, col));
+
+                    if(enemyPiece == null){
+                        continue;
+                    }
+
+                    Collection<ChessMove> enemyMoves = enemyPiece.pieceMoves(board, new ChessPosition(row, col));
+
+                    for(ChessMove enemyMove: enemyMoves){
+                        if(enemyMove.getEndPosition().equals(kingPosition)){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
