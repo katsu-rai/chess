@@ -156,19 +156,41 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition kingPosition = null;
-        outloop:
+        if(!isInCheck(teamColor)){
+            return false;
+        }
+
+        ArrayList<ChessMove> allValidMoves = new ArrayList<>();
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if (piece != null
-                        && piece.getPieceType() == ChessPiece.PieceType.KING
-                        && piece.getTeamColor() == teamColor) {
-                    kingPosition = new ChessPosition(row, col);
-                    break outloop;
+                ChessPosition currentPosition = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(currentPosition);
+
+                if(piece == null
+                        || piece.getTeamColor() != teamColor){
+                    continue;
+                }
+
+
+                Collection<ChessMove> safeMoves = validMoves(currentPosition);
+
+                for (ChessMove move : safeMoves) {
+                    ChessPiece movingPiece = board.getPiece(currentPosition);
+                    ChessPiece temp = board.getPiece(move.getEndPosition());
+
+                    board.addPiece(currentPosition, null);
+                    board.addPiece(move.getEndPosition(), movingPiece);
+                    if(!isInCheck(teamColor)){
+                        return false;
+                    }
+
+                    board.addPiece(currentPosition, movingPiece);
+                    board.addPiece(move.getEndPosition(), temp);
                 }
             }
         }
+
+        return true;
     }
 
     /**
