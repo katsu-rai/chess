@@ -14,7 +14,9 @@ public class ChessGame {
     ChessGame.TeamColor teamTurn;
     ChessBoard board;
     public ChessGame() {
-
+        board = new ChessBoard();
+        board.resetBoard();
+        teamTurn = ChessGame.TeamColor.WHITE;
     }
 
     /**
@@ -83,7 +85,7 @@ public class ChessGame {
         Collection<ChessMove> safeMoves = validMoves(move.getStartPosition());
         ChessPosition startPosition = move.getStartPosition();
         if(safeMoves.isEmpty()){
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Valid Move " + move + " is empty");
         }
 
         ChessPiece movingPiece = board.getPiece(startPosition);
@@ -98,7 +100,7 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), movingPiece);
             setTeamTurn(teamTurn == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK);
         } else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Invalid Move");
         }
     }
 
