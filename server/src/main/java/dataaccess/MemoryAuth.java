@@ -17,9 +17,9 @@ public class MemoryAuth implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(AuthData authToken){
+    public void deleteAuth(String authToken){
         for (AuthData authData : database){
-            if(authData.equals(authToken)){
+            if(authData.authToken().equals(authToken)){
                 database.remove(authData);
                 break;
             }

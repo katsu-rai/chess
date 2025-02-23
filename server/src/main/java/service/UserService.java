@@ -16,7 +16,9 @@ public class UserService {
     }
 
     public AuthData register(UserData user) {
-        return new AuthData("rkatsura", "123");
+        userDAO.createUser(user);
+        String authToken = UUID.randomUUID().toString();
+        return new AuthData(user.username(), authToken);
     }
 
     public AuthData login(UserData userData) {
@@ -38,7 +40,12 @@ public class UserService {
         return null;
     }
 
-    public void logout(UserData user) {
+    public void logout(String authToken) {
+        try {
+            authDAO.deleteAuth(authToken);
+        } catch(DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void clear(){
