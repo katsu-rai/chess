@@ -100,5 +100,6 @@ public class GameService {
 
     public void clear(){
         gameDAO.clear();
+        authDAO.clear();
     }
 }

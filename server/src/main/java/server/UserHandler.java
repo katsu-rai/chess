@@ -13,7 +13,7 @@ public class UserHandler {
      }
 
 
-    public Object register(Request req, Response resp) throws Exception {
+    public Object register(Request req, Response res) throws Exception {
 
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
 
@@ -23,36 +23,38 @@ public class UserHandler {
 
         try {
             AuthData authData = userService.register(userData);
-            resp.status(200);
+            res.status(200);
             return new Gson().toJson(authData);
         } catch (Exception e) {
-            resp.status(400);
+            res.status(400);
             return "Error happened during registration process";
         }
     }
 
-    public Object login(Request req, Response resp) throws Exception {
+    public Object login(Request req, Response res) throws Exception {
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
 
         try {
             AuthData authData = userService.login(userData);
-            resp.status(200);
-            return new Gson().toJson(authData);
+            if (authData != null) {
+                res.status(200);
+                return new Gson().toJson(authData);
+            }
         } catch (Exception e) {
-            resp.status(400);
+            res.status(400);
             return "Error happened during login process";
         }
     }
 
-    public Object logout(Request req, Response resp) throws Exception {
+    public Object logout(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
 
         try {
             userService.logout(authToken);
-            resp.status(200);
+            res.status(200);
             return "{}";
         } catch (Exception e) {
-            resp.status(400);
+            res.status(400);
             return "Error happened during logout process";
         }
     }

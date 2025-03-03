@@ -24,7 +24,6 @@ public class UserService {
     public AuthData login(UserData userData) {
 //        Check if the user has matched password
         if(userDAO.authenticate(userData.username(), userData.password())) {
-
 //            Generate authToken
             String authToken = UUID.randomUUID().toString();
             AuthData authData = new AuthData(userData.username(), authToken);
