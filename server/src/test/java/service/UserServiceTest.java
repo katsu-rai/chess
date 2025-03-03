@@ -69,12 +69,10 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Valid Logout")
+    @DisplayName("Invalid Logout")
     void inValidLogout() throws DataAccessException {
-        AuthData authData = userService.register(defaultUser);
-        userService.logout(authData.authToken());
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            authDAO.getAuth(authData.authToken());
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            userService.logout("InvalidToken");
         });
     }
 

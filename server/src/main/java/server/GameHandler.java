@@ -91,8 +91,8 @@ public class GameHandler {
             }
 
             String color = requestBody.get("playerColor").getAsString();
-            boolean IsValidColor = color.equals("WHITE") || color.equals("BLACK");
-            if (!IsValidColor) {
+            boolean isValidColor = color.equals("WHITE") || color.equals("BLACK");
+            if (!isValidColor) {
                 res.status(400);
                 return "{ \"message\": \"Error: bad request\" }";
             }

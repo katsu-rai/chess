@@ -10,7 +10,7 @@ public class Queen implements PieceMoveCalculator {
         int[][] moveDirections = {{-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}};
         ChessGame.TeamColor team = board.getTeam(currPosition);
 
-        return PieceMoveCalculator.DynamicMoves(board, currPosition, moveDirections, currRow, currCol, team);
+        return PieceMoveCalculator.dynamicMoves(board, currPosition, moveDirections, currRow, currCol, team);
     }
 
 }

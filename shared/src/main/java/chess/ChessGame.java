@@ -127,24 +127,28 @@ public class ChessGame {
 
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                if(board.getPiece(new ChessPosition(row, col)) != null
-                        && board.getPiece(new ChessPosition(row, col)).getTeamColor() == teamColor) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+
+                if (piece == null || piece.getTeamColor() == teamColor) {
                     continue;
-                } else {
-                    ChessPiece enemyPiece = board.getPiece(new ChessPosition(row, col));
-
-                    if(enemyPiece == null){
-                        continue;
-                    }
-
-                    Collection<ChessMove> enemyMoves = enemyPiece.pieceMoves(board, new ChessPosition(row, col));
-
-                    for(ChessMove enemyMove: enemyMoves){
-                        if(enemyMove.getEndPosition().equals(kingPosition)){
-                            return true;
-                        }
-                    }
                 }
+
+                if (isKingInCheckByEnemy(piece, position, kingPosition)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isKingInCheckByEnemy(ChessPiece enemyPiece, ChessPosition position, ChessPosition kingPosition) {
+        Collection<ChessMove> enemyMoves = enemyPiece.pieceMoves(board, position);
+
+        for (ChessMove enemyMove : enemyMoves) {
+            if (enemyMove.getEndPosition().equals(kingPosition)) {
+                return true;
             }
         }
 

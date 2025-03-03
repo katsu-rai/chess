@@ -14,33 +14,39 @@ public class Pawn implements PieceMoveCalculator {
 
         boolean promote = (team == ChessGame.TeamColor.WHITE && currRow == 7) || (team == ChessGame.TeamColor.BLACK && currRow == 2);
         if (promote) {
-            promotionPieces = new ChessPiece.PieceType[]{ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN};
+            promotionPieces = new ChessPiece.PieceType[]
+                    {
+                        ChessPiece.PieceType.ROOK,
+                        ChessPiece.PieceType.KNIGHT,
+                        ChessPiece.PieceType.BISHOP,
+                        ChessPiece.PieceType.QUEEN
+                    };
         }
 
         for (ChessPiece.PieceType promotionPiece : promotionPieces) {
 
             ChessPosition secondFrontStep = new ChessPosition(currRow + moveIncrement, currCol);
-            if (PieceMoveCalculator.IsValid(secondFrontStep)
+            if (PieceMoveCalculator.isValid(secondFrontStep)
                     && board.getPiece(secondFrontStep) == null) {
                 moves.add(new ChessMove(currPosition, secondFrontStep, promotionPiece));
             }
 
             ChessPosition leftAttack = new ChessPosition(currRow + moveIncrement, currCol-1);
-            if (PieceMoveCalculator.IsValid(leftAttack)
+            if (PieceMoveCalculator.isValid(leftAttack)
                     && board.getPiece(leftAttack) != null
                     && board.getTeam(leftAttack) != team) {
                 moves.add(new ChessMove(currPosition, leftAttack, promotionPiece));
             }
             ChessPosition rightAttack = new ChessPosition(currRow + moveIncrement, currCol+1);
 
-            if (PieceMoveCalculator.IsValid(rightAttack)
+            if (PieceMoveCalculator.isValid(rightAttack)
                     && board.getPiece(rightAttack) != null
                     && board.getTeam(rightAttack) != team) {
                 moves.add(new ChessMove(currPosition, rightAttack, promotionPiece));
             }
 
             ChessPosition doubleForwardPosition = new ChessPosition(currRow + moveIncrement*2, currCol);
-            if (PieceMoveCalculator.IsValid(doubleForwardPosition)
+            if (PieceMoveCalculator.isValid(doubleForwardPosition)
                     && ((team == ChessGame.TeamColor.WHITE && currRow == 2)
                     || (team == ChessGame.TeamColor.BLACK && currRow == 7))
                     && board.getPiece(doubleForwardPosition) == null

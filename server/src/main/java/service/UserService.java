@@ -32,9 +32,9 @@ public class UserService {
     }
 
     public AuthData login(UserData userData) {
-        boolean userAuthenticated = userDAO.authenticate(userData.username(), userData.password());
+        boolean isUserAuthenticated = userDAO.authenticate(userData.username(), userData.password());
 //        Check if the user has matched password
-        if(userAuthenticated) {
+        if(isUserAuthenticated) {
 //            Generate authToken
             String authToken = UUID.randomUUID().toString();
             AuthData authData = new AuthData(userData.username(), authToken);
@@ -58,20 +58,6 @@ public class UserService {
         }
 
         authDAO.deleteAuth(authToken);
-    }
-
-    public AuthData addUser(UserData user) throws Exception {
-        try {
-            userDAO.createUser(user);
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
-
-        String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(user.username(), authToken);
-        authDAO.addAuth(authData);
-
-        return authData;
     }
 
     public void clear(){

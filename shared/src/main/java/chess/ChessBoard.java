@@ -31,7 +31,9 @@ public class ChessBoard {
         if (getPiece(position) != null) {
             return getPiece(position).getTeamColor();
         }
-        else return null;
+        else {
+            return null;
+        }
     }
 
     /**
@@ -95,11 +97,13 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
 
-        if (o == null || getClass() != o.getClass())
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(board, that.board);
@@ -108,11 +112,5 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(board);
-    }
-
-    public ChessBoard copy() {
-        ChessBoard boardCopy = new ChessBoard();
-        boardCopy.board = board.clone();
-        return boardCopy;
     }
 }

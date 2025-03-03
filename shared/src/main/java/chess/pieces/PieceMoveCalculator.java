@@ -10,13 +10,13 @@ import java.util.HashSet;
 
 public interface PieceMoveCalculator {
 
-    static boolean IsValid(ChessPosition position) {
+    static boolean isValid(ChessPosition position) {
         int row = position.getRow();
         int column = position.getColumn();
         return row >= 1 && row <= 8 && column >= 1 && column <= 8;
     }
 
-    static HashSet<ChessMove> StaticMoves(ChessPosition startPosition, int[][] possibleMoves, ChessBoard chessBoard) {
+    static HashSet<ChessMove> staticMoves(ChessPosition startPosition, int[][] possibleMoves, ChessBoard chessBoard) {
         HashSet<ChessMove> maxMoves = new HashSet<>(8);
 
         int startCol = startPosition.getColumn();
@@ -30,7 +30,7 @@ public interface PieceMoveCalculator {
 
             ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
 
-            if (IsValid(targetPosition) && chessBoard.getTeam(targetPosition) != playerTeam) {
+            if (isValid(targetPosition) && chessBoard.getTeam(targetPosition) != playerTeam) {
                 maxMoves.add(new ChessMove(startPosition, targetPosition, null));
             }
         }
@@ -38,7 +38,14 @@ public interface PieceMoveCalculator {
         return maxMoves;
     }
 
-    static HashSet<ChessMove> DynamicMoves(ChessBoard chessBoard, ChessPosition startPosition, int[][] directions, int startRow, int startCol, ChessGame.TeamColor playerTeam) {
+    static HashSet<ChessMove> dynamicMoves(
+            ChessBoard chessBoard,
+            ChessPosition startPosition,
+            int[][] directions,
+            int startRow,
+            int startCol,
+            ChessGame.TeamColor playerTeam) {
+
         HashSet<ChessMove> directionalMoves = new HashSet<>(27); // Allocate for larger sets of moves
 
         for (int[] direction : directions) {
@@ -51,7 +58,7 @@ public interface PieceMoveCalculator {
 
                 ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
 
-                if (!IsValid(targetPosition)) {
+                if (!isValid(targetPosition)) {
                     stopSearch = true;
                 } else if (chessBoard.getPiece(targetPosition) == null) {
                     directionalMoves.add(new ChessMove(startPosition, targetPosition, null));
