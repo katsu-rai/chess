@@ -22,8 +22,15 @@ public class MemoryUser implements UserDAO {
     }
 
     @Override
-    public void createUser(UserData userData){
-        database.add(userData);
+    public void createUser(UserData userData) throws Exception{
+        try {
+            getUser(userData.username());
+        } catch (Exception e) {
+            database.add(userData);
+            return;
+        }
+
+        throw new Exception();
     }
 
     @Override

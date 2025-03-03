@@ -16,14 +16,25 @@ public class UserService {
     }
 
     public AuthData register(UserData user) {
-        userDAO.createUser(user);
+        try {
+            userDAO.createUser(user);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         String authToken = UUID.randomUUID().toString();
+        AuthData newAuthData = new AuthData(user.username(), authToken);
+        try {
+            authDAO.addAuth(newAuthData);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return new AuthData(user.username(), authToken);
     }
 
     public AuthData login(UserData userData) {
+        boolean userAuthenticated = userDAO.authenticate(userData.username(), userData.password());
 //        Check if the user has matched password
-        if(userDAO.authenticate(userData.username(), userData.password())) {
+        if(userAuthenticated) {
 //            Generate authToken
             String authToken = UUID.randomUUID().toString();
             AuthData authData = new AuthData(userData.username(), authToken);
@@ -34,17 +45,19 @@ public class UserService {
             }
 
             return authData;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     public void logout(String authToken) {
         try {
-            authDAO.deleteAuth(authToken);
+            authDAO.getAuth(authToken);
         } catch(DataAccessException e) {
             throw new RuntimeException(e);
         }
+
+        authDAO.deleteAuth(authToken);
     }
 
     public AuthData addUser(UserData user) throws Exception {

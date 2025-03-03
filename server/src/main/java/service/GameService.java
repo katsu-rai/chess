@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
+import model.AuthData;
 import model.GameData;
 
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public class GameService {
         return gameDAO.getAllGames();
     }
 
-    public int createGame(String authToken, String gameName) throws Exception {
+    public int createGame(String authToken, GameData gameData) throws Exception {
         try {
             authDAO.getAuth(authToken);
         } catch (Exception e) {
@@ -44,8 +45,8 @@ public class GameService {
             board.resetBoard();
             game.setBoard(board);
 
-            GameData gameData = new GameData(gameID, null, null, gameName, game);
-            gameDAO.addGame(gameData);
+            GameData newGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            gameDAO.addGame(newGameData);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -67,11 +68,12 @@ public class GameService {
         }
     }
 
-    public boolean joinGame(String authToken, int gameID, String color) throws Exception {
+    public void joinGame(String authToken, int gameID, String color) throws Exception, InvalidAuthTokenException, UsernameAlreadyTakenException {
+        AuthData authData;
         try {
-            authDAO.getAuth(authToken);
+            authData = authDAO.getAuth(authToken);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new InvalidAuthTokenException(e.getMessage());
         }
 
         GameData gameData;
@@ -85,9 +87,15 @@ public class GameService {
         String blackUser = gameData.blackUsername();
 
         if (color.equals("WHITE")) {
-            whiteUser = gameData.whiteUsername();
+            if (whiteUser != null) {
+                throw new UsernameAlreadyTakenException("White user is already taken");
+            }
+            whiteUser = authData.username();
         } else {
-            blackUser = gameData.blackUsername();
+            if (blackUser != null) {
+                throw new UsernameAlreadyTakenException("Black user is already taken");
+            }
+            blackUser = authData.username();
         }
 
         try {
@@ -95,11 +103,22 @@ public class GameService {
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
-        return true;
     }
 
     public void clear(){
         gameDAO.clear();
-        authDAO.clear();
+    }
+
+    public class InvalidAuthTokenException extends Exception {
+        public InvalidAuthTokenException(String message) {
+            super(message);
+        }
+    }
+
+    public class UsernameAlreadyTakenException extends Exception {
+        public UsernameAlreadyTakenException(String message) {
+            super(message);
+        }
     }
 }
+

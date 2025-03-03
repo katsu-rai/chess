@@ -18,31 +18,29 @@ public class UserHandler {
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
 
         if (userData.username() == null || userData.password() == null) {
-            System.out.println("Invalid username or password");
+            res.status(400);
+            return "{ \"message\": \"Error: bad request\" }";
         }
-
         try {
             AuthData authData = userService.register(userData);
             res.status(200);
             return new Gson().toJson(authData);
         } catch (Exception e) {
-            res.status(400);
-            return "Error happened during registration process";
+            res.status(403);
+            return "{ \"message\": \"Error: already taken\" }";
         }
     }
 
     public Object login(Request req, Response res) throws Exception {
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
+        AuthData authData = userService.login(userData);
 
-        try {
-            AuthData authData = userService.login(userData);
-            if (authData != null) {
-                res.status(200);
-                return new Gson().toJson(authData);
-            }
-        } catch (Exception e) {
-            res.status(400);
-            return "Error happened during login process";
+        if  (authData != null) {
+            res.status(200);
+            return new Gson().toJson(authData);
+        } else {
+            res.status(401);
+            return "{ \"message\": \"Error: unauthorized\" }";
         }
     }
 
@@ -54,8 +52,8 @@ public class UserHandler {
             res.status(200);
             return "{}";
         } catch (Exception e) {
-            res.status(400);
-            return "Error happened during logout process";
+            res.status(401);
+            return "{ \"message\": \"Error: unauthorized\" }";
         }
     }
 }

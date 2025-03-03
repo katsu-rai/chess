@@ -36,16 +36,21 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", (req, res) -> {
-            clear();
-            res.status(200);
-            return "";
+            try {
+                clear();
+                res.status(200);
+                return "";
+            } catch (Exception e) {
+                res.status(500);
+                return "Error: " + e.getMessage();
+            }
         });
 
         Spark.post("/user", userHandler::register);
         Spark.post("/session", userHandler::login);
         Spark.delete("/session", userHandler::logout);
         Spark.get("/game", gameHandler::getAllGames);
-        Spark.post("/game", gameHandler::addGame);
+        Spark.post("/game", gameHandler::createGame);
         Spark.put("/game", gameHandler::joinGame);
 
         Spark.awaitInitialization();

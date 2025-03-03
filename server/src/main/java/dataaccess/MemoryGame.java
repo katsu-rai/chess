@@ -45,7 +45,9 @@ public class MemoryGame implements GameDAO{
     public void updateGame(GameData newGameData) throws DataAccessException {
         for (GameData game: database) {
             if(game.gameID() == newGameData.gameID()) {
-                game = newGameData;
+                database.remove(game);
+                database.add(newGameData);
+                return;
             }
         }
         throw new DataAccessException("This Game ID does not exist: " + newGameData.gameID());
