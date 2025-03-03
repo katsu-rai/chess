@@ -48,6 +48,20 @@ public class UserService {
         }
     }
 
+    public AuthData addUser(UserData user) throws Exception {
+        try {
+            userDAO.createUser(user);
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(user.username(), authToken);
+        authDAO.addAuth(authData);
+
+        return authData;
+    }
+
     public void clear(){
         userDAO.clear();
         authDAO.clear();
