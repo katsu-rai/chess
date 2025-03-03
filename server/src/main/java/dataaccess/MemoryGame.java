@@ -35,4 +35,19 @@ public class MemoryGame implements GameDAO{
     public void clear(){
         database = new HashSet<GameData>();
     }
+
+    @Override
+    public int getMaxId(){
+        return database.size();
+    }
+
+    @Override
+    public void updateGame(GameData newGameData) throws DataAccessException {
+        for (GameData game: database) {
+            if(game.gameID() == newGameData.gameID()) {
+                game = newGameData;
+            }
+        }
+        throw new DataAccessException("This Game ID does not exist: " + newGameData.gameID());
+    }
 }

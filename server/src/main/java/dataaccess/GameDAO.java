@@ -10,4 +10,6 @@ public interface GameDAO {
     void addGame(GameData game) throws DataAccessException;
     GameData getGame(int id) throws DataAccessException;
     void clear();
+    int getMaxId();
+    void updateGame(GameData game) throws DataAccessException;
 }

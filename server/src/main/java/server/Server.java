@@ -14,6 +14,7 @@ public class Server {
 
     GameService gameService;
 
+
     public Server() {
         userDAO = new MemoryUser();
         authDAO= new MemoryAuth();
