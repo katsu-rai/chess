@@ -4,8 +4,6 @@ import dataaccess.*;
 import service.*;
 import spark.*;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class Server {
     UserDAO userDAO;
     AuthDAO authDAO;
@@ -14,6 +12,19 @@ public class Server {
     UserService userService;
     UserHandler userHandler;
 
+    GameService gameService;
+
+    public Server() {
+        userDAO = new MemoryUser();
+        authDAO= new MemoryAuth();
+        gameDAO = new MemoryGame();
+
+        userService = new UserService(userDAO, authDAO);
+        userHandler = new UserHandler(userService);
+
+        gameService = new GameService(gameDAO, authDAO);
+    }
+
     public int run(int desiredPort) {
 
         Spark.port(desiredPort);
@@ -21,6 +32,16 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.delete("/db", (req, res) -> {
+            clear();
+            res.status(200);
+            return "";
+        });
+
+        Spark.post("/user", userHandler::register);
+        Spark.post("/session", userHandler::login);
+        Spark.delete("/session", userHandler::logout);
+
         Spark.awaitInitialization();
         return Spark.port();
     }
@@ -29,4 +50,11 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+
+    public void clear() {
+        userService.clear();
+    }
+
 }
+
+
