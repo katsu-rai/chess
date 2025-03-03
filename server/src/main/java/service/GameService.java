@@ -53,27 +53,16 @@ public class GameService {
         return gameID;
     }
 
-    public GameData getGameData(String authToken, int gameID) throws Exception {
-        try {
-            authDAO.getAuth(authToken);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-
-        try {
-            GameData gameData = gameDAO.getGame(gameID);
-            return gameData;
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
     public void joinGame(String authToken, int gameID, String color) throws Exception, InvalidAuthTokenException, UsernameAlreadyTakenException {
         AuthData authData;
         try {
             authData = authDAO.getAuth(authToken);
         } catch (Exception e) {
             throw new InvalidAuthTokenException(e.getMessage());
+        }
+
+        if (!color.equals("BLACK")&& !color.equals("WHITE")) {
+            throw new Exception();
         }
 
         GameData gameData;
@@ -109,13 +98,13 @@ public class GameService {
         gameDAO.clear();
     }
 
-    public class InvalidAuthTokenException extends Exception {
+    public static class InvalidAuthTokenException extends Exception {
         public InvalidAuthTokenException(String message) {
             super(message);
         }
     }
 
-    public class UsernameAlreadyTakenException extends Exception {
+    public static class UsernameAlreadyTakenException extends Exception {
         public UsernameAlreadyTakenException(String message) {
             super(message);
         }
