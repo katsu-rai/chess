@@ -77,4 +77,23 @@ public class UserServiceTest {
             authDAO.getAuth(authData.authToken());
         });
     }
+
+    @Test
+    @DisplayName("Valid Clear")
+    void validClear() throws DataAccessException {
+        AuthData authData = userService.register(defaultUser);
+        userService.clear();
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            authDAO.getAuth(authData.authToken());
+        });
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            userDAO.getUser(defaultUser.username());
+        });
+    }
+
+    @Test
+    @DisplayName("No Exception")
+    void invalidClear() {
+        Assertions.assertDoesNotThrow(() -> userService.clear());
+    }
 }
