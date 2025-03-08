@@ -7,20 +7,32 @@ import java.util.HashSet;
 public class SQLGame implements GameDAO {
 
     @Override
-    HashSet<GameData> getAllGames();
+    public HashSet<GameData> getAllGames(){
+        return new HashSet<>();
+    }
 
     @Override
-    void addGame(GameData game) throws DataAccessException;
+    public void addGame(GameData game) throws DataAccessException{
+
+    }
 
     @Override
-    GameData getGame(int id) throws DataAccessException;
+    public GameData getGame(int id) throws DataAccessException{
+        return null;
+    }
 
     @Override
-    void clear();
+    public void clear(){
+
+    }
 
     @Override
-    int getMaxId();
+    public int getMaxId(){
+        return 0;
+    }
 
     @Override
-    void updateGame(GameData game) throws DataAccessException;
+    public void updateGame(GameData game) throws DataAccessException{
+
+    }
 }

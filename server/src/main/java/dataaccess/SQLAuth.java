@@ -57,23 +57,41 @@ public class SQLAuth implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException{
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("SELECT FROM auth WHERE authToken = ?")) {
-                statement.setString(1, authToken);
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        String sql = "SELECT username FROM auth WHERE authToken = ?";
 
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    String username =  resultSet.getString("username");
+        try (
+                Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, authToken);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String username = resultSet.getString("username");
                     return new AuthData(authToken, username);
+                } else {
+                    throw new DataAccessException("This AuthToken does not exist: " + authToken);
                 }
             }
-        } catch (DataAccessException | SQLException e) {
-            throw new DataAccessException("This AuthToken does not exist: " + authToken);
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error while retrieving auth data");
         }
     }
 
+
     @Override
     public void clear(){
+        String sql = "TRUNCATE auth";
+        try (
+                Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+                ) {
 
+                 statement.executeQuery();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
