@@ -22,7 +22,7 @@ public class SQLGame implements GameDAO {
                                 gameID INT NOT NULL,
                                 whiteUsername VARCHAR(50),
                                 blackUsername VARCHAR(50),
-                                gameName VARCHAR(50),
+                                gameName VARCHAR(50) NOT NULL,
                                 chessGame TEXT,
                                 PRIMARY KEY (gameID)
                                 )""";
@@ -63,20 +63,16 @@ public class SQLGame implements GameDAO {
 
     @Override
     public void addGame(GameData game) throws DataAccessException {
-        String query = "INSERT INTO game (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?, ?)";
         try (var connection = DatabaseManager.getConnection();
-             var stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, game.whiteUsername());
-            stmt.setString(2, game.blackUsername());
-            stmt.setString(3, game.gameName());
-            stmt.setString(4, serializeGame(game.game()));
+             var stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, game.gameID());
+            stmt.setString(2, game.whiteUsername());
+            stmt.setString(3, game.blackUsername());
+            stmt.setString(4, game.gameName());
+            stmt.setString(5, serializeGame(game.game()));
             stmt.executeUpdate();
 
-            try (var generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    game.gameID(generatedKeys.getInt(1));
-                }
-            }
         } catch (SQLException e) {
             throw new DataAccessException("Error inserting game: " + e.getMessage());
         }
@@ -84,9 +80,9 @@ public class SQLGame implements GameDAO {
 
     @Override
     public GameData getGame(int id) throws DataAccessException {
-        String query = "SELECT * FROM game WHERE gameID = ?";
-        try (var connection = DatabaseManager.getConnection();
-             var stmt = connection.prepareStatement(query)) {
+        String sql = "SELECT * FROM game WHERE gameID = ?";
+        try (Connection connection = DatabaseManager.getConnection();
+             var stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -106,9 +102,9 @@ public class SQLGame implements GameDAO {
 
     @Override
     public void clear() {
-        String query = "DELETE FROM game";
+        String sql = "DELETE FROM game";
         try (var connection = DatabaseManager.getConnection();
-             var stmt = connection.prepareStatement(query)) {
+             var stmt = connection.prepareStatement(sql)) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
@@ -117,9 +113,9 @@ public class SQLGame implements GameDAO {
 
     @Override
     public int getMaxId() {
-        String query = "SELECT MAX(gameID) AS maxID FROM game";
+        String sql = "SELECT MAX(gameID) AS maxID FROM game";
         try (var connection = DatabaseManager.getConnection();
-             var stmt = connection.prepareStatement(query);
+             var stmt = connection.prepareStatement(sql);
              var rs = stmt.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt("maxID");
@@ -132,9 +128,9 @@ public class SQLGame implements GameDAO {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        String query = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, chessGame = ? WHERE gameID = ?";
+        String sql = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, chessGame = ? WHERE gameID = ?";
         try (var connection = DatabaseManager.getConnection();
-             var stmt = connection.prepareStatement(query)) {
+             var stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, game.whiteUsername());
             stmt.setString(2, game.blackUsername());
             stmt.setString(3, game.gameName());
