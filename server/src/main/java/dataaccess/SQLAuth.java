@@ -1,18 +1,60 @@
 package dataaccess;
 
 import model.AuthData;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class SQLAuth implements AuthDAO {
 
-    @Override
-    void addAuth(AuthData authData) throws DataAccessException;
+    public SQLAuth() {
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (Connection connection = DatabaseManager.getConnection()) {
+            var createTestTable = """            
+                    CREATE TABLE if NOT EXISTS auth (
+                                    authToken VARCHAR(50) NOT NULL,
+                                    username VARCHAR(50) NOT NULL,
+                                    PRIMARY KEY (authToken)
+                                    )""";
+
+            try (var createTableStatement = connection.prepareStatement(createTestTable)) {
+                createTableStatement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
-    void deleteAuth(String authToken);
+    public void addAuth(AuthData authData) throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO auth (username, authToken) VALUES(?, ?)")) {
+                statement.setString(1, authData.username());
+                statement.setString(2, authData.authToken());
+                statement.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
-    AuthData getAuth(String authToken) throws DataAccessException;
+    public void deleteAuth(String authToken){
+
+    }
 
     @Override
-    void clear();
+    public AuthData getAuth(String authToken) throws DataAccessException{
+
+    }
+
+    @Override
+    public void clear(){
+
+    }
 }
