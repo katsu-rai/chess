@@ -60,31 +60,61 @@ public class SQLGame implements GameDAO {
         return resultGames;
     }
 
+
     @Override
     public void addGame(GameData game) throws DataAccessException {
+        String query = "INSERT INTO game (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
+        try (var connection = DatabaseManager.getConnection();
+             var stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, game.whiteUsername());
+            stmt.setString(2, game.blackUsername());
+            stmt.setString(3, game.gameName());
+            stmt.setString(4, serializeGame(game.game()));
+            stmt.executeUpdate();
 
+            try (var generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    game.gameID(generatedKeys.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error inserting game: " + e.getMessage());
+        }
     }
 
     @Override
     public GameData getGame(int id) throws DataAccessException {
+        String query = "SELECT * FROM game WHERE gameID = ?";
+        try (var connection = DatabaseManager.getConnection();
+             var stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (var rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new GameData(
+                            rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            rs.getString("gameName"),
+                            deserializeGame(rs.getString("chessGame")));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error retrieving game: " + e.getMessage());
+        }
         return null;
     }
 
     @Override
     public void clear() {
-
+        String query = "DELETE FROM game";
+        try (var connection = DatabaseManager.getConnection();
+             var stmt = connection.prepareStatement(query)) {
+            stmt.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    @Override
-    public int getMaxId() {
-        return 0;
-    }
-
-    @Override
-    public void updateGame(GameData game) throws DataAccessException {
-
-    }
-
+    
     private String serializeGame(ChessGame game) {
         return new Gson().toJson(game);
     }
