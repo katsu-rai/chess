@@ -114,6 +114,37 @@ public class SQLGame implements GameDAO {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public int getMaxId() {
+        String query = "SELECT MAX(gameID) AS maxID FROM game";
+        try (var connection = DatabaseManager.getConnection();
+             var stmt = connection.prepareStatement(query);
+             var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("maxID");
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+    @Override
+    public void updateGame(GameData game) throws DataAccessException {
+        String query = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, chessGame = ? WHERE gameID = ?";
+        try (var connection = DatabaseManager.getConnection();
+             var stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, game.whiteUsername());
+            stmt.setString(2, game.blackUsername());
+            stmt.setString(3, game.gameName());
+            stmt.setString(4, serializeGame(game.game()));
+            stmt.setInt(5, game.gameID());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating game: " + e.getMessage());
+        }
+    }
     
     private String serializeGame(ChessGame game) {
         return new Gson().toJson(game);
