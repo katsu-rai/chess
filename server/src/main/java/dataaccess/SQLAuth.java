@@ -69,7 +69,7 @@ public class SQLAuth implements AuthDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String username = resultSet.getString("username");
-                    return new AuthData(authToken, username);
+                    return new AuthData(username, authToken);
                 } else {
                     throw new DataAccessException("This AuthToken does not exist: " + authToken);
                 }
@@ -88,7 +88,7 @@ public class SQLAuth implements AuthDAO {
                 PreparedStatement statement = connection.prepareStatement(sql)
                 ) {
 
-                 statement.executeQuery();
+                 statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
