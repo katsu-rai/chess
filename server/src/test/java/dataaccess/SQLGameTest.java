@@ -73,7 +73,75 @@ public class SQLGameTest {
 
     @Test
     void negativeAddGame(){
-        var invalidGame = new GameData(0, null, null,null, null);
+        GameData invalidGame = new GameData(0, null, null,null, null);
         assertThrows(DataAccessException.class, () -> gameDAO.addGame(invalidGame), "Adding an invalid game should throw an exception");
     }
+
+    @Test
+    void positiveGetGame() throws DataAccessException {
+        gameDAO.addGame(defaultGame);
+
+        GameData result = gameDAO.getGame(1);
+
+        assertNotNull(result);
+        assertEquals(1, result.gameID());
+        assertEquals("whiteUser", result.whiteUsername());
+        assertEquals("blackUser", result.blackUsername());
+        assertEquals("Test Game", result.gameName());
+    }
+
+    @Test
+    void negativeGetGame_gameNotFound() throws DataAccessException {
+        GameData result = gameDAO.getGame(999);
+        assertNull(result);
+    }
+
+    @Test
+    void positiveClear() throws DataAccessException {
+        gameDAO.addGame(new GameData(1, "whiteUser1", "blackUser1", "Game 1", new ChessGame()));
+        gameDAO.addGame(new GameData(2, "whiteUser2", "blackUser2", "Game 2", new ChessGame()));
+
+        gameDAO.clear();
+
+        HashSet<GameData> allGames = gameDAO.getAllGames();
+        assertTrue(allGames.isEmpty());
+    }
+
+    @Test
+    void positiveGetMaxId() throws DataAccessException {
+        gameDAO.addGame(new GameData(1, "whiteUser1", "blackUser1", "Game 1", new ChessGame()));
+        gameDAO.addGame(new GameData(2, "whiteUser2", "blackUser2", "Game 2", new ChessGame()));
+
+        int maxId = gameDAO.getMaxId();
+        assertEquals(2, maxId);
+    }
+
+    @Test
+    void negativeGetMaxIdEmptyDatabase() throws DataAccessException {
+        gameDAO.clear();
+
+        int maxId = gameDAO.getMaxId();
+        assertEquals(0, maxId);
+    }
+
+    @Test
+    void positiveUpdateGame() throws DataAccessException {
+        gameDAO.addGame(defaultGame);
+
+        GameData game = new GameData(1, "whiteUserUpdated", "blackUserUpdated", "Updated Game", new ChessGame());
+        gameDAO.updateGame(game);
+
+        GameData updatedGame = gameDAO.getGame(1);
+        assertNotNull(updatedGame);
+        assertEquals("whiteUserUpdated", updatedGame.whiteUsername());
+        assertEquals("blackUserUpdated", updatedGame.blackUsername());
+        assertEquals("Updated Game", updatedGame.gameName());
+    }
+
+    @Test
+    void negativeUpdateGameGameNotFound() throws DataAccessException {
+        GameData nonExistingGame = new GameData(999, "whiteUser1", "blackUser1", "Non Existing Game", new ChessGame());
+        assertThrows(DataAccessException.class, () -> gameDAO.updateGame(nonExistingGame), "Updating a non-existing game should throw an exception");
+    }
+
 }

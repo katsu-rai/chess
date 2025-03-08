@@ -44,31 +44,31 @@ class SQLAuthTest {
 
     @Test
     void testDeleteAuthNegativeNonExistentAuthToken() {
-        assertDoesNotThrow(() -> authDAO.deleteAuth("NON_EXISTENT_TOKEN"));
+        assertDoesNotThrow(() -> authDAO.deleteAuth("NONEXISTENTTOKEN"));
     }
 
 
     @Test
-    void testGetAuth_Positive() throws DataAccessException {
+    void testGetAuthPositive() throws DataAccessException {
         authDAO.addAuth(testAuth);
         AuthData retrieved = authDAO.getAuth(testAuth.authToken());
         assertEquals(testAuth.username(), retrieved.username());
     }
 
     @Test
-    void testGetAuth_Negative_NonExistentAuthToken() {
-        assertThrows(DataAccessException.class, () -> authDAO.getAuth("INVALID_TOKEN"));
+    void testGetAuthNegativeNonExistentAuthToken() {
+        assertThrows(DataAccessException.class, () -> authDAO.getAuth("INVALIDTOKEN"));
     }
 
     @Test
-    void testClear_Positive() throws DataAccessException {
+    void testClearPositive() throws DataAccessException {
         authDAO.addAuth(testAuth);
         authDAO.clear();
         assertThrows(DataAccessException.class, () -> authDAO.getAuth(testAuth.authToken()));
     }
 
     @Test
-    void testClear_Negative_EmptyTable() {
+    void testClearNegativeEmptyTable() {
         assertDoesNotThrow(() -> authDAO.clear());
     }
 }

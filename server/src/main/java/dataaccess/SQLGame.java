@@ -128,6 +128,21 @@ public class SQLGame implements GameDAO {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
+
+        String checkIfExistsSql = "SELECT COUNT(*) FROM game WHERE gameID = ?";
+        try (var connection = DatabaseManager.getConnection();
+             var checkStmt = connection.prepareStatement(checkIfExistsSql)) {
+            checkStmt.setInt(1, game.gameID());
+
+            try (var rs = checkStmt.executeQuery()) {
+                if (rs.next() && rs.getInt(1) == 0) {
+                    throw new DataAccessException("Game with ID " + game.gameID() + " does not exist.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error checking if game exists: " + e.getMessage());
+        }
+
         String sql = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, chessGame = ? WHERE gameID = ?";
         try (var connection = DatabaseManager.getConnection();
              var stmt = connection.prepareStatement(sql)) {
