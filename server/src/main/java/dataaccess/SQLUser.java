@@ -6,7 +6,10 @@ import java.sql.SQLException;
 
 public class SQLUser implements UserDAO {
 
-    public SQLUser(){
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public SQLUser() {
+        this.passwordEncoder = new BCryptPasswordEncoder();
         try {
             DatabaseManager.createDatabase();
         } catch (DataAccessException ex) {
@@ -30,13 +33,47 @@ public class SQLUser implements UserDAO {
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException{
+    public UserData getUser(String username) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "SELECT ＊ FROM user WHERE username = ?";
+            try (var statement = connection.prepareStatement(sql)) {
+                statement.setString(1, username);
+                try (var resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String userName = resultSet.getString("username");
+                        String password = resultSet.getString("password");
+                        String email = resultSet.getString("email");
+
+                        return new UserData(userName, password, email);
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Error retrieving user data");
+        }
+
         return null;
     }
 
     @Override
-    public void createUser(UserData user) throws Exception{
+    public void createUser(UserData user) throws Exception {
+        String encodedPassword = passwordEncoder.encode(user.password());
 
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+            try (var statement = connection.prepareStatement(sql)) {
+                statement.setString(1, user.username());
+                statement.setString(2, encodedPassword);
+                statement.setString(3, user.email());
+
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Failed to insert user data.");
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Error creating new user");
+        }
     }
 
     @Override
