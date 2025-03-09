@@ -77,12 +77,28 @@ public class SQLUser implements UserDAO {
     }
 
     @Override
-    public boolean authenticate(String username, String password){
+    public boolean authenticate(String username, String password) {
+        try {
+            UserData user = getUser(username);
+            if (user != null) {
+                return passwordEncoder.matches(password, user.password());
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         return false;
     }
 
     @Override
-    public void clear(){
-
+    public void clear() {
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "DELETE FROM user";
+            try (var statement = connection.prepareStatement(sql)) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException("Error clearing user data", e);
+        }
     }
 }
