@@ -1,15 +1,12 @@
 package dataaccess;
 
 import model.UserData;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 import java.sql.SQLException;
 
 public class SQLUser implements UserDAO {
 
-    private final BCryptPasswordEncoder passwordEncoder;
-
     public SQLUser() {
-        this.passwordEncoder = new BCryptPasswordEncoder();
         try {
             DatabaseManager.createDatabase();
         } catch (DataAccessException ex) {
@@ -17,7 +14,7 @@ public class SQLUser implements UserDAO {
         }
 
         try (var connection = DatabaseManager.getConnection()) {
-            var createTestTable = """            
+            var createTestTable = """
                 CREATE TABLE if NOT EXISTS user (
                                 username VARCHAR(50) NOT NULL,
                                 password VARCHAR(255) NOT NULL,
@@ -57,7 +54,7 @@ public class SQLUser implements UserDAO {
 
     @Override
     public void createUser(UserData user) throws Exception {
-        String encodedPassword = passwordEncoder.encode(user.password());
+        String encodedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
 
         try (var connection = DatabaseManager.getConnection()) {
             var sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
@@ -81,7 +78,7 @@ public class SQLUser implements UserDAO {
         try {
             UserData user = getUser(username);
             if (user != null) {
-                return passwordEncoder.matches(password, user.password());
+                return BCrypt.checkpw(password, user.password());
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
