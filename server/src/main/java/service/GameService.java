@@ -27,6 +27,7 @@ public class GameService {
         }
 
         return gameDAO.getAllGames();
+
     }
 
     public int createGame(String authToken, GameData gameData) throws Exception {
