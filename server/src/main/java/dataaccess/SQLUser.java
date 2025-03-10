@@ -20,7 +20,7 @@ public class SQLUser implements UserDAO {
             var createTestTable = """            
                 CREATE TABLE if NOT EXISTS user (
                                 username VARCHAR(50) NOT NULL,
-                                password VARCHAR(50) NOT NULL,
+                                password VARCHAR(255) NOT NULL,
                                 email VARCHAR(100),
                                 PRIMARY KEY (username)
                                 )""";
@@ -35,7 +35,7 @@ public class SQLUser implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
-            var sql = "SELECT ＊ FROM user WHERE username = ?";
+            var sql = "SELECT * FROM user WHERE username = ?";
             try (var statement = connection.prepareStatement(sql)) {
                 statement.setString(1, username);
                 try (var resultSet = statement.executeQuery()) {
@@ -44,7 +44,7 @@ public class SQLUser implements UserDAO {
                         String password = resultSet.getString("password");
                         String email = resultSet.getString("email");
 
-                        return new UserData(userName, password, email);
+                        return new UserData(userName, email, password);
                     }
                 }
             }
