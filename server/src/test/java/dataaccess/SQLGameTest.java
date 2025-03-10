@@ -48,9 +48,24 @@ public class SQLGameTest {
         assertNotNull(allGames);
         assertEquals(3, allGames.size());
 
-        assertTrue(allGames.stream().anyMatch(game ->game.gameID() == 1 && game.whiteUsername().equals("whiteUser1") && game.blackUsername().equals("blackUser1") && game.gameName().equals("Game 1")));
-        assertTrue(allGames.stream().anyMatch(game ->game.gameID() == 2 && game.whiteUsername().equals("whiteUser2") && game.blackUsername().equals("blackUser2") && game.gameName().equals("Game 2")));
-        assertTrue(allGames.stream().anyMatch(game ->game.gameID() == 3 && game.whiteUsername().equals("whiteUser3") && game.blackUsername().equals("blackUser3") && game.gameName().equals("Game 3")));
+        assertTrue(allGames.stream().anyMatch(
+                game ->game.gameID() == 1
+                        && game.whiteUsername().equals("whiteUser1")
+                        && game.blackUsername().equals("blackUser1")
+                        && game.gameName().equals("Game 1")
+        ));
+        assertTrue(allGames.stream().anyMatch(
+                game ->game.gameID() == 2
+                        && game.whiteUsername().equals("whiteUser2")
+                        && game.blackUsername().equals("blackUser2")
+                        && game.gameName().equals("Game 2")
+        ));
+        assertTrue(allGames.stream().anyMatch(
+                game ->game.gameID() == 3
+                        && game.whiteUsername().equals("whiteUser3")
+                        && game.blackUsername().equals("blackUser3")
+                        && game.gameName().equals("Game 3")
+        ));
     }
 
     @Test
@@ -91,7 +106,7 @@ public class SQLGameTest {
     }
 
     @Test
-    void negativeGetGame_gameNotFound() throws DataAccessException {
+    void negativeGetGameGameNotFound() throws DataAccessException {
         GameData result = gameDAO.getGame(999);
         assertNull(result);
     }
