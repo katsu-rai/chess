@@ -2,14 +2,13 @@ package dataaccess;
 
 import model.UserData;
 import org.junit.jupiter.api.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SQLUserTest {
 
     private SQLUser sqlUser;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @BeforeEach
     void setUp() {
@@ -30,7 +29,7 @@ class SQLUserTest {
         assertNotNull(retrievedUser);
         assertEquals("testUser", retrievedUser.username());
         assertEquals("test@example.com", retrievedUser.email());
-        assertTrue(passwordEncoder.matches("password123", retrievedUser.password()));
+        assertTrue(BCrypt.checkpw("password123", retrievedUser.password()));
     }
 
     @Test
