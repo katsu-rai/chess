@@ -24,7 +24,7 @@ public class BoardPrinter {
             }
 
             output.append(startingRow(reversed));
-            if (j < 1) output.append("\n");
+            if (j < 1) {output.append("\n");}
             reversed = false;
         }
 
@@ -58,7 +58,7 @@ public class BoardPrinter {
 
     private String piece(int row, int column) {
         ChessPiece piece = board.getPiece(new ChessPosition(row, column));
-        if (piece == null) return "   ";
+        if (piece == null) {return "   ";}
 
         String color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? SET_TEXT_COLOR_WHITE : SET_TEXT_COLOR_BLACK;
         String symbol = switch (piece.getPieceType()) {

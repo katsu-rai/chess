@@ -2,10 +2,9 @@ package ui;
 
 import client.ServerFacade;
 import model.GameData;
-
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import static ui.EscapeSequences.*;
 
 import static java.lang.System.out;
 
@@ -131,13 +130,14 @@ public class PostLoginUI {
 
 
     private void printHelpMenu() {
-        out.println("\nAvailable Commands:");
-        out.println("create <NAME> - Create a new game");
-        out.println("list - List all available games");
-        out.println("join <ID> <WHITE|BLACK> - Join a game as a player");
-        out.println("observe <ID> - Observe a game as a spectator");
-        out.println("logout - Log out of current user");
-        out.println("quit - Stop playing");
-        out.println("help - Show this menu");
+        out.println(SET_TEXT_COLOR_YELLOW + "\nAvailable Commands:" + RESET_TEXT_COLOR);
+        out.println(SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " - Create a new game");
+        out.println(SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " - List all available games");
+        out.println(SET_TEXT_COLOR_BLUE + "join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR + " - Join a game as a player");
+        out.println(SET_TEXT_COLOR_MAGENTA + "observe <ID>" + RESET_TEXT_COLOR + " - Observe a game as a spectator");
+        out.println(SET_TEXT_COLOR_RED + "logout" + RESET_TEXT_COLOR + " - Log out of current user");
+        out.println(SET_TEXT_COLOR_RED + "quit" + RESET_TEXT_COLOR + " - Stop playing");
+        out.println(SET_TEXT_COLOR_GREEN + "help" + RESET_TEXT_COLOR + " - Show this menu");
+
     }
 }

@@ -25,7 +25,6 @@ public class PreLoginUI {
                 case "quit":
                     return;
                 case "help":
-                    printHelpMenu();
                     break;
                 case "login":
                     loggedIn = handleLogin();
@@ -45,21 +44,23 @@ public class PreLoginUI {
     }
 
     private String[] getUserInput() {
+        out.print("\n");
+        out.print("[LOGGED_OUT] >>> ");
         return scanner.nextLine().trim().split(" ");
     }
 
     private void printHelpMenu() {
-        out.println("register - create a new user");
-        out.println("login - login to an existing user");
-        out.println("quit - stop playing");
-        out.println("help - show menu");
+        out.println(SET_TEXT_COLOR_YELLOW + "register" + RESET_TEXT_COLOR + " - create a new user");
+        out.println(SET_TEXT_COLOR_YELLOW + "login" + RESET_TEXT_COLOR + " - login to an existing user");
+        out.println(SET_TEXT_COLOR_RED + "quit" + RESET_TEXT_COLOR + " - stop playing");
+        out.println(SET_TEXT_COLOR_GREEN + "help" + RESET_TEXT_COLOR + " - show menu");
     }
 
     private boolean handleLogin() {
         while (true) {
             out.println("Enter username and password separated by space (or type 'back' to return):");
             String[] credentials = scanner.nextLine().trim().split(" ", 2);
-            if (credentials[0].equalsIgnoreCase("back")) return false;
+            if (credentials[0].equalsIgnoreCase("back")) {return false;}
             if (credentials.length < 2) {
                 out.println("Invalid input. Please enter both username and password.");
                 continue;
@@ -81,7 +82,7 @@ public class PreLoginUI {
         while (true) {
             out.println("Enter username, password, and email separated by spaces (or type 'back' to return):");
             String[] credentials = scanner.nextLine().trim().split(" ", 3);
-            if (credentials[0].equalsIgnoreCase("back")) return false;
+            if (credentials[0].equalsIgnoreCase("back")) {return false;};
             if (credentials.length < 3) {
                 out.println("Invalid input. Please enter username, password, and email.");
                 continue;
