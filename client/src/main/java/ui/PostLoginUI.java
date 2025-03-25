@@ -12,9 +12,9 @@ public class PostLoginUI {
 
     public void run() {
         out.println("Welcome to the Chess Game Lobby!");
-        printHelpMenu();
 
         while (true) {
+            printHelpMenu();
             out.print("\n[LOGGED IN] >>> ");
             String[] input = scanner.nextLine().trim().split(" ", 3);
             String command = input[0].toLowerCase();

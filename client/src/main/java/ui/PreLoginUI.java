@@ -9,6 +9,7 @@ import client.ServerFacade;
 public class PreLoginUI {
     private final Scanner scanner = new Scanner(System.in);
     private final ServerFacade server = new ServerFacade("http://localhost:8080");
+    private final PostLoginUI postLogin = new PostLoginUI();
 
     public void run() {
         boolean loggedIn = false;
@@ -39,8 +40,8 @@ public class PreLoginUI {
             }
         }
 
-        // Proceed to post-login UI
-        // PostLoginUI.run();
+//         Proceed to post-login UI
+         postLogin.run();
     }
 
     private String[] getUserInput() {
