@@ -73,8 +73,20 @@ public class ServerFacade {
         if (resp.containsKey("Error")) {
             return new ArrayList<>();
         }
-        return (List<GameData>) resp.get("games");
+
+        List<?> rawGames = (List<?>) resp.get("games");
+        List<GameData> games = new ArrayList<>();
+
+        Gson gson = new Gson();
+        for (Object obj : rawGames) {
+            String json = gson.toJson(obj);
+            GameData game = gson.fromJson(json, GameData.class);
+            games.add(game);
+        }
+
+        return games;
     }
+
 
     public boolean joinGame(int gameId, String playerColor) {
         var body = Map.of("gameID", gameId, "playerColor", playerColor);
