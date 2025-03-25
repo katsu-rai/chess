@@ -4,8 +4,11 @@ import java.util.Scanner;
 
 import static java.lang.System.out;
 import static ui.EscapeSequences.*;
+import client.ServerFacade;
+
 public class PreLoginUI {
     Scanner scanner = new Scanner(System.in);
+    ServerFacade server = new ServerFacade();
 
     public void run() {
 
