@@ -78,6 +78,7 @@ public class PostLoginUI {
         }
         int gameID = server.createGame(input[1]);
         out.printf("Created game, ID: %d%n", gameID);
+        games = server.listGamesMap();
     }
 
     private void joinGame(String[] input) {
