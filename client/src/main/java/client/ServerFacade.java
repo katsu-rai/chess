@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,24 +69,28 @@ public class ServerFacade {
         return ((Number) resp.get("gameID")).intValue();
     }
 
-    public List<GameData> listGames() {
+    public Map<Integer, GameData> listGamesMap() {
         Map resp = request("GET", "/game", null);
         if (resp.containsKey("Error")) {
-            return new ArrayList<>();
+            return Map.of(); // Return an empty map if an error occurs
         }
 
-        List<?> rawGames = (List<?>) resp.get("games");
-        List<GameData> games = new ArrayList<>();
+        List<Map<String, Object>> gameList = (List<Map<String, Object>>) resp.get("games");
+        Map<Integer, GameData> gameMap = new HashMap<>();
 
-        Gson gson = new Gson();
-        for (Object obj : rawGames) {
-            String json = gson.toJson(obj);
-            GameData game = gson.fromJson(json, GameData.class);
-            games.add(game);
+        for (Map<String, Object> gameDataMap : gameList) {
+            int gameID = ((Number) gameDataMap.get("gameID")).intValue();
+            String gameName = (String) gameDataMap.get("gameName");
+            String whiteUser = (String) gameDataMap.getOrDefault("whiteUsername", null);
+            String blackUser = (String) gameDataMap.getOrDefault("blackUsername", null);
+
+            GameData gameData = new GameData(gameID, gameName, whiteUser, blackUser, null);
+            gameMap.put(gameID, gameData);
         }
 
-        return games;
+        return gameMap;
     }
+
 
 
     public boolean joinGame(int gameId, String playerColor) {
