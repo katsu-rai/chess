@@ -51,10 +51,10 @@ public class ServerFacade {
         return true;
     }
 
-    public boolean createGame(String gameName) {
+    public int createGame(String gameName) {
         var body = Map.of("gameName", gameName);
         Map resp = request("POST", "/game", new Gson().toJson(body));
-        return !resp.containsKey("Error");
+        return (int) resp.get("gameId");
     }
 
     public List<GameData> listGames() {
