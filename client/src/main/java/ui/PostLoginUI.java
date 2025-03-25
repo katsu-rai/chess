@@ -1,7 +1,9 @@
 package ui;
 
 import client.ServerFacade;
+import model.GameData;
 
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.System.out;
@@ -26,16 +28,37 @@ public class PostLoginUI {
             switch (command) {
                 case "quit":
                     return;
+
                 case "help":
                     printHelpMenu();
                     break;
+
                 case "logout":
                     out.println("Logging out...");
                     new PreLoginUI().run();
                     return;
+
                 case "list":
-                    out.println(server.listGames());
+                    List<GameData> games = server.listGames();
+                    if (games.isEmpty()) {
+                        out.println("No Game Available");
+                    } else {
+                        StringBuilder sb = new StringBuilder("Active Games:\n");
+                        int index = 1;
+                        for (GameData game : games) {
+                            String gameName = game.gameName();
+                            String whiteUser = game.whiteUsername() != null ? game.whiteUsername() : "open";
+                            String blackUser = game.blackUsername() != null ? game.blackUsername() : "open";
+
+                            sb.append(index++).append(". Game Name: ").append(gameName)
+                                    .append(" | Players: White - ").append(whiteUser)
+                                    .append(", Black - ").append(blackUser)
+                                    .append("\n");
+                        }
+                        out.println(sb.toString());
+                    }
                     break;
+
                 case "create":
                     if (input.length < 2) {
                         out.println("Missing a game name");
@@ -44,6 +67,7 @@ public class PostLoginUI {
                         out.printf("Created game, ID: %d%n", gameID);
                     }
                     break;
+
                 case "join":
                     if (input.length < 3) {
                         out.println("Usage: join <ID> [WHITE|BLACK]");
@@ -60,6 +84,7 @@ public class PostLoginUI {
                         }
                     }
                     break;
+
                 default:
                     out.println("Unknown command. Type 'help' for a list of commands.");
                     break;

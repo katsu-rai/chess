@@ -35,7 +35,6 @@ public class PreLoginUI {
                     break;
                 default:
                     out.println("Invalid command, please try again");
-                    printHelpMenu();
                     break;
             }
         }
