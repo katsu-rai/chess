@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 
@@ -72,7 +73,7 @@ public class ServerFacade {
     public Map<Integer, GameData> listGamesMap() {
         Map resp = request("GET", "/game", null);
         if (resp.containsKey("Error")) {
-            return Map.of(); // Return an empty map if an error occurs
+            return Map.of();
         }
 
         List<Map<String, Object>> gameList = (List<Map<String, Object>>) resp.get("games");
@@ -84,7 +85,10 @@ public class ServerFacade {
             String whiteUser = (String) gameDataMap.getOrDefault("whiteUsername", null);
             String blackUser = (String) gameDataMap.getOrDefault("blackUsername", null);
 
-            GameData gameData = new GameData(gameID, gameName, whiteUser, blackUser, null);
+            String gameJson = new Gson().toJson(gameDataMap.get("game"));
+            ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+
+            GameData gameData = new GameData(gameID, whiteUser, blackUser, gameName, game);
             gameMap.put(gameID, gameData);
         }
 

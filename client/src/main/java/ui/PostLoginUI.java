@@ -111,23 +111,24 @@ public class PostLoginUI {
             return;
         }
 
+        games = server.listGamesMap(); // Refresh game list
+
         try {
             int gameID = Integer.parseInt(input[1]);
-            if (!games.containsKey(gameID)) {
+            GameData gameData = games.get(gameID);
+
+            if (gameData == null) {
                 out.println("Game does not exist.");
                 return;
             }
 
-            if (server.joinGame(gameID, null)) { // null means observer
-                out.println("You have joined the game as an observer.");
-                new BoardPrinter(games.get(gameID).game().getBoard()).printBoard();
-            } else {
-                out.println("Game does not exist.");
-            }
+            out.println("Observing game: " + gameData.gameName());
+            new BoardPrinter(gameData.game().getBoard()).printBoard();
         } catch (NumberFormatException e) {
             out.println("Invalid game ID format. Please enter a valid number.");
         }
     }
+
 
     private void printHelpMenu() {
         out.println("\nAvailable Commands:");
