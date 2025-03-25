@@ -8,7 +8,7 @@ import client.ServerFacade;
 
 public class PreLoginUI {
     Scanner scanner = new Scanner(System.in);
-    ServerFacade server = new ServerFacade();
+    ServerFacade server = new ServerFacade("http://localhost:8080");
 
     public void run() {
 

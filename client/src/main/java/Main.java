@@ -11,10 +11,13 @@ public class Main {
 //        prelogin.run();
 
 
-        ServerFacade server = new ServerFacade();
+        ServerFacade server = new ServerFacade("http://localhost:8080");
 
-        System.out.println(server.register("username", "password", "email"));
-
-        System.out.println(server.login("username", "password"));
+        System.out.println(server.register("rai", "password", "email"));
+        System.out.println(server.login("rai", "password"));
+        System.out.println(server.createGame("TestGame"));
+        System.out.println(server.listGames());
+        System.out.println(server.joinGame(1, "WHITE"));
+        System.out.println(server.listGames());
     }
 }
