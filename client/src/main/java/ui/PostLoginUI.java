@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import client.ServerFacade;
 import model.GameData;
 import java.util.Map;
@@ -88,14 +89,22 @@ public class PostLoginUI {
         try {
             int gameID = Integer.parseInt(input[1]);
             String color = input[2].toUpperCase();
+
             if (!games.containsKey(gameID)) {
                 out.println("Game does not exist.");
                 return;
             }
 
+            if (!color.equals("WHITE") && !color.equals("BLACK")){
+                out.println("Invalid Color");
+                return;
+            }
+
             if (server.joinGame(gameID, color)) {
                 out.println("You have joined the game as " + color);
-                new BoardPrinter(games.get(gameID).game().getBoard()).printBoard();
+                new BoardPrinter(games.get(gameID).game().getBoard()).printBoard(
+                        color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK
+                );
             } else {
                 out.println("Game does not exist or color is already taken.");
             }
@@ -122,7 +131,7 @@ public class PostLoginUI {
             }
 
             out.println("Observing game: " + gameData.gameName());
-            new BoardPrinter(gameData.game().getBoard()).printBoard();
+            new BoardPrinter(gameData.game().getBoard()).printBoard(ChessGame.TeamColor.WHITE);
         } catch (NumberFormatException e) {
             out.println("Invalid game ID format. Please enter a valid number.");
         }
@@ -134,7 +143,7 @@ public class PostLoginUI {
         out.println(SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " - Create a new game");
         out.println(SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " - List all available games");
         out.println(SET_TEXT_COLOR_BLUE + "join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR + " - Join a game as a player");
-        out.println(SET_TEXT_COLOR_MAGENTA + "observe <ID>" + RESET_TEXT_COLOR + " - Observe a game as a spectator");
+        out.println(SET_TEXT_COLOR_BLUE + "observe <ID>" + RESET_TEXT_COLOR + " - Observe a game as a spectator");
         out.println(SET_TEXT_COLOR_RED + "logout" + RESET_TEXT_COLOR + " - Log out of current user");
         out.println(SET_TEXT_COLOR_RED + "quit" + RESET_TEXT_COLOR + " - Stop playing");
         out.println(SET_TEXT_COLOR_GREEN + "help" + RESET_TEXT_COLOR + " - Show this menu");

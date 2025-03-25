@@ -12,22 +12,17 @@ public class BoardPrinter {
         this.board = board;
     }
 
-    public void printBoard() {
+    public void printBoard(ChessGame.TeamColor perspective) {
         StringBuilder output = new StringBuilder(SET_TEXT_BOLD);
-        boolean reversed = true;
+        boolean reversed = (perspective == ChessGame.TeamColor.BLACK);
 
-        for (int j = 0; j < 2; j++) {
-            output.append(startingRow(reversed));
+        output.append(startingRow(reversed));
 
-            for (int i = 8; i > 0; i--) {
-                output.append(boardRow(reversed ? (9 - i) : i, reversed));
-            }
-
-            output.append(startingRow(reversed));
-            if (j < 1) {output.append("\n");}
-            reversed = false;
+        for (int i = 8; i > 0; i--) {
+            output.append(boardRow(reversed ? (9 - i) : i, reversed));
         }
 
+        output.append(startingRow(reversed));
         output.append(RESET_TEXT_BOLD_FAINT);
         out.println(output);
     }
@@ -43,7 +38,7 @@ public class BoardPrinter {
 
         for (int i = 1; i <= 8; i++) {
             int column = reversed ? (9 - i) : i;
-            output.append(squareColor(row, column)).append(piece(row, column));
+            output.append(squareColor(row, column, reversed)).append(piece(row, column));
         }
 
         output.append(SET_BG_COLOR_BLACK).append(SET_TEXT_COLOR_BLUE)
@@ -52,24 +47,27 @@ public class BoardPrinter {
         return output.toString();
     }
 
-    private String squareColor(int row, int column) {
-        return ((row + column) % 2 == 0) ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_RED;
+    private String squareColor(int row, int column, boolean reversed) {
+        if (reversed) {
+            return ((row + column) % 2 == 0) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
+        }
+        return ((row + column) % 2 == 0) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
     }
+
 
     private String piece(int row, int column) {
         ChessPiece piece = board.getPiece(new ChessPosition(row, column));
-        if (piece == null) {return "   ";}
+        if (piece == null) { return EMPTY; }
 
-        String color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? SET_TEXT_COLOR_WHITE : SET_TEXT_COLOR_BLACK;
-        String symbol = switch (piece.getPieceType()) {
-            case QUEEN -> " Q ";
-            case KING -> " K ";
-            case BISHOP -> " B ";
-            case KNIGHT -> " N ";
-            case ROOK -> " R ";
-            case PAWN -> " P ";
-        };
+        String pieceColor = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? SET_TEXT_COLOR_BLUE : SET_TEXT_COLOR_RED;
 
-        return color + symbol;
+        return pieceColor + switch (piece.getPieceType()) {
+            case QUEEN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN;
+            case KING -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING;
+            case BISHOP -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP;
+            case KNIGHT -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT;
+            case ROOK -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK;
+            case PAWN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN;
+        } + RESET_TEXT_COLOR;
     }
 }
