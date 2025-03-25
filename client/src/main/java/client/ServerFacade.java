@@ -17,9 +17,14 @@ import java.util.Map;
 public class ServerFacade {
     private final String baseURL;
     private String authToken;
+    private int lastResponseCode; // Stores the last HTTP response code
 
     public ServerFacade(String baseURL) {
         this.baseURL = baseURL;
+    }
+
+    public int getLastResponseCode() {
+        return lastResponseCode;
     }
 
     public boolean register(String username, String password, String email) {
@@ -90,9 +95,10 @@ public class ServerFacade {
             }
 
             http.connect();
+            lastResponseCode = http.getResponseCode(); // Store the last response code
 
-            if (http.getResponseCode() == 401) {
-                return Map.of("Error", 401);
+            if (lastResponseCode >= 400) { // Error codes
+                return Map.of("Error", lastResponseCode);
             }
 
             try (InputStream respBody = http.getInputStream();
@@ -100,6 +106,7 @@ public class ServerFacade {
                 return new Gson().fromJson(inputStreamReader, Map.class);
             }
         } catch (URISyntaxException | IOException e) {
+            lastResponseCode = 500; // Internal error
             return Map.of("Error", e.getMessage());
         }
     }
