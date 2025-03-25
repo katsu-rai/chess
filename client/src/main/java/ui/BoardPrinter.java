@@ -38,7 +38,7 @@ public class BoardPrinter {
 
         for (int i = 1; i <= 8; i++) {
             int column = reversed ? (9 - i) : i;
-            output.append(squareColor(row, column, reversed)).append(piece(row, column));
+            output.append(squareColor(row, column)).append(piece(row, column));
         }
 
         output.append(SET_BG_COLOR_BLACK).append(SET_TEXT_COLOR_BLUE)
@@ -47,11 +47,8 @@ public class BoardPrinter {
         return output.toString();
     }
 
-    private String squareColor(int row, int column, boolean reversed) {
-        if (reversed) {
-            return ((row + column) % 2 == 0) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-        }
-        return ((row + column) % 2 == 0) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
+    private String squareColor(int row, int column) {
+        return ((row + column) % 2 == 0) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
     }
 
 
