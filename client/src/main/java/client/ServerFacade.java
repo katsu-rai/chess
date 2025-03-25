@@ -59,7 +59,13 @@ public class ServerFacade {
     public int createGame(String gameName) {
         var body = Map.of("gameName", gameName);
         Map resp = request("POST", "/game", new Gson().toJson(body));
-        return (int) resp.get("gameId");
+
+        if (!resp.containsKey("gameID")) {
+            System.err.println("Failed to create game. Server response: " + resp);
+            return -1; // Indicating failure
+        }
+
+        return ((Number) resp.get("gameID")).intValue();
     }
 
     public List<GameData> listGames() {

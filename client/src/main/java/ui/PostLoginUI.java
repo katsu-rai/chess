@@ -7,8 +7,12 @@ import java.util.Scanner;
 import static java.lang.System.out;
 
 public class PostLoginUI {
-    private final ServerFacade server = new ServerFacade("http://localhost:8080");
+    private final ServerFacade server;
     private final Scanner scanner = new Scanner(System.in);
+
+    public PostLoginUI(ServerFacade server){
+        this.server = server;
+    }
 
     public void run() {
         out.println("Welcome to the Chess Game Lobby!");
@@ -34,7 +38,7 @@ public class PostLoginUI {
                     break;
                 case "create":
                     if (input.length < 2) {
-                        out.println("Usage: create <NAME>");
+                        out.println("Missing a game name");
                     } else {
                         int gameID = server.createGame(input[1]);
                         out.printf("Created game, ID: %d%n", gameID);
