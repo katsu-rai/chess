@@ -4,10 +4,11 @@
 //import chess.InvalidMoveException;
 //import com.google.gson.Gson;
 //import dataaccess.*;
-//import model.AuthData;
-//import model.GameData;
+//import model.*;
 //import org.eclipse.jetty.websocket.api.Session;
 //import org.eclipse.jetty.websocket.api.annotations.*;
+//import websocket.commands.*;
+//import service.*;
 //
 //
 //import java.io.IOException;
@@ -33,14 +34,14 @@
 //        System.out.printf("Received: %s\n", message);
 //
 //        if (message.contains("\"commandType\":\"JOIN_PLAYER\"")) {
-//            JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
+//            Connect command = new Gson().fromJson(message, Connect.class);
 //            Server.gameSessions.replace(session, command.getGameID());
-//            handleJoinPlayer(session, command);
+//            handlePlayerConnect(session, command);
 //        }
 //        else if (message.contains("\"commandType\":\"JOIN_OBSERVER\"")) {
-//            JoinObserver command = new Gson().fromJson(message, JoinObserver.class);
+//            Connect command = new Gson().fromJson(message, Connect.class);
 //            Server.gameSessions.replace(session, command.getGameID());
-//            handleJoinObserver(session, command);
+//            handleObserverConnect(session, command);
 //        }
 //        else if (message.contains("\"commandType\":\"MAKE_MOVE\"")) {
 //            MakeMove command = new Gson().fromJson(message, MakeMove.class);
@@ -56,11 +57,11 @@
 //        }
 //    }
 //
-//    private void handleJoinPlayer(Session session, JoinPlayer command) throws IOException {
+//    private void handlePlayerConnect(Session session, Connect command) throws IOException {
 //
 //        try {
-//            AuthData auth = Server.userService.getAuth(command.getAuthString());
-//            GameData game = Server.gameService.getGameData(command.getAuthString(), command.getGameID());
+//            AuthData auth = Server.userService.getAuth(command.getAuthToken());
+//            GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
 //
 //            ChessGame.TeamColor joiningColor = command.getColor().toString().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 //
@@ -92,7 +93,7 @@
 //
 //    }
 //
-//    private void handleJoinObserver(Session session, JoinObserver command) throws IOException {
+//    private void handleObserverConnect(Session session, Connect command) throws IOException {
 //        try {
 //            AuthData auth = Server.userService.getAuth(command.getAuthString());
 //            GameData game = Server.gameService.getGameData(command.getAuthString(), command.getGameID());
