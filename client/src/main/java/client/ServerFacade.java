@@ -29,6 +29,14 @@ public class ServerFacade {
         return lastResponseCode;
     }
 
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
     public boolean register(String username, String password, String email) {
         var body = Map.of("username", username, "password", password, "email", email);
         Map resp = request("POST", "/user", new Gson().toJson(body));

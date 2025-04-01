@@ -53,6 +53,10 @@ public class Server {
             }
         });
 
+        Spark.staticFiles.location("web");
+
+        Spark.webSocket("/connect", WebSocketHandler.class);
+
         Spark.post("/user", userHandler::register);
         Spark.post("/session", userHandler::login);
         Spark.delete("/session", userHandler::logout);
