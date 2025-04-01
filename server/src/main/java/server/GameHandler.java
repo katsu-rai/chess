@@ -19,7 +19,7 @@ public class GameHandler {
         this.gameService = gameService;
     }
 
-    public Object getAllGames(Request req, Response res) throws Exception {
+    public Object getAllGames(Request req, Response res){
         String authToken = req.headers("authorization");
         try {
             HashSet<GameData> games = gameService.getAllGames(authToken);
