@@ -64,5 +64,13 @@ public class UserService {
         userDAO.clear();
         authDAO.clear();
     }
+
+    public AuthData getAuth(String authToken) throws RuntimeException {
+        try {
+            return authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 

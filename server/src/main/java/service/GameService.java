@@ -3,6 +3,7 @@ package service;
 import chess.ChessBoard;
 import chess.ChessGame;
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
@@ -54,7 +55,7 @@ public class GameService {
         return gameID;
     }
 
-    public void joinGame(String authToken, int gameID, String color) throws Exception, InvalidAuthTokenException, UsernameAlreadyTakenException {
+    public void joinGame(String authToken, int gameID, String color) throws Exception {
         AuthData authData;
         try {
             authData = authDAO.getAuth(authToken);
@@ -91,6 +92,20 @@ public class GameService {
         try {
             gameDAO.updateGame(new GameData(gameID, whiteUser, blackUser, gameData.gameName(), gameData.game()));
         } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public GameData getGameData(String authToken, Integer gameID) throws Exception {
+        try {
+            authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new Exception(e.getMessage());
+        }
+
+        try {
+            return gameDAO.getGame(gameID);
+        } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }
     }
