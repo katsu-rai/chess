@@ -1,10 +1,17 @@
 package server;
 
 import dataaccess.*;
+import org.eclipse.jetty.websocket.api.Session;
 import service.*;
 import spark.*;
 
+import java.util.concurrent.ConcurrentHashMap;
+
+
 public class Server {
+
+    static ConcurrentHashMap<Session, Integer> gameSessions = new ConcurrentHashMap<org.eclipse.jetty.websocket.api.Session, Integer>();
+
     UserDAO userDAO;
     AuthDAO authDAO;
     GameDAO gameDAO;
