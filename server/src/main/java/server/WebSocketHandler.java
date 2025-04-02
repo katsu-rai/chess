@@ -39,16 +39,16 @@ public class WebSocketHandler {
 
         System.out.printf("Received: %s\n", message);
 
-        if (message.contains("\"commandType\":\"JOIN_PLAYER\"")) {
+        if (message.contains("\"commandType\":\"CONNECT\"")) {
             Connect command = new Gson().fromJson(message, Connect.class);
             Server.gameSessions.replace(session, command.getGameID());
             handlePlayerConnect(session, command);
         }
-        else if (message.contains("\"commandType\":\"JOIN_OBSERVER\"")) {
-            Connect command = new Gson().fromJson(message, Connect.class);
-            Server.gameSessions.replace(session, command.getGameID());
-            handleObserverConnect(session, command);
-        }
+//        else if (message.contains("\"commandType\":\"JOIN_OBSERVER\"")) {
+//            Connect command = new Gson().fromJson(message, Connect.class);
+//            Server.gameSessions.replace(session, command.getGameID());
+//            handleObserverConnect(session, command);
+//        }
         else if (message.contains("\"commandType\":\"MAKE_MOVE\"")) {
             MakeMove command = new Gson().fromJson(message, MakeMove.class);
             handleMakeMove(session, command);
