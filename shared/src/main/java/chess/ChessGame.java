@@ -13,6 +13,7 @@ import java.util.Collections;
 public class ChessGame {
     ChessGame.TeamColor teamTurn;
     ChessBoard board;
+    boolean gameOver;
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
@@ -232,6 +233,14 @@ public class ChessGame {
         }
 
         return true;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public boolean getGameOver() {
+        return gameOver;
     }
 
     /**

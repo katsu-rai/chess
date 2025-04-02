@@ -51,15 +51,15 @@ public class WebSocketHandler {
         }
         else if (message.contains("\"commandType\":\"MAKE_MOVE\"")) {
             MakeMove command = new Gson().fromJson(message, MakeMove.class);
-//            handleMakeMove(session, command);
+            handleMakeMove(session, command);
         }
         else if (message.contains("\"commandType\":\"LEAVE\"")) {
             Leave command = new Gson().fromJson(message, Leave.class);
-//            handleLeave(session, command);
+            handleLeave(session, command);
         }
         else if (message.contains("\"commandType\":\"RESIGN\"")) {
             Resign command = new Gson().fromJson(message, Resign.class);
-//            handleResign(session, command);
+            handleResign(session, command);
         }
     }
 
@@ -140,6 +140,105 @@ public class WebSocketHandler {
         }
     }
 
+
+    private void handleMakeMove(Session session, MakeMove command) throws Exception {
+        try {
+            AuthData auth = userService.getAuth(command.getAuthToken());
+            GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
+            ChessGame.TeamColor userColor = getTeamColor(auth.username(), game);
+            if (userColor == null) {
+                sendError(session, new Error("Error: You are observing this game"));
+                return;
+            }
+
+            if (game.game().getGameOver()) {
+                sendError(session, new Error("Error: can not make a move, game is over"));
+                return;
+            }
+
+            if (game.game().getTeamTurn().equals(userColor)) {
+                game.game().makeMove(command.getMove());
+
+                Notification notif;
+                ChessGame.TeamColor opponentColor = userColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+
+                if (game.game().isInCheckmate(opponentColor)) {
+                    notif = new Notification("Checkmate! %s wins!".formatted(auth.username()));
+                    game.game().setGameOver(true);
+                }
+                else if (game.game().isInStalemate(opponentColor)) {
+                    notif = new Notification("Stalemate caused by %s's move! It's a tie!".formatted(auth.username()));
+                    game.game().setGameOver(true);
+                }
+                else if (game.game().isInCheck(opponentColor)) {
+                    notif = new Notification("A move has been made by %s, %s is now in check!".formatted(auth.username(), opponentColor.toString()));
+                }
+                else {
+                    notif = new Notification("A move has been made by %s".formatted(auth.username()));
+                }
+                broadcastMessage(session, notif);
+
+                gameService.updateGame(auth.authToken(), game);
+
+                LoadGame load = new LoadGame(game.game());
+                broadcastMessage(session, load, true);
+            }
+            else {
+                sendError(session, new Error("Error: it is not your turn"));
+            }
+        }
+        catch (RuntimeException e) {
+            sendError(session, new Error("Error: Not authorized"));
+        } catch (InvalidMoveException e) {
+            System.out.println("****** error: " + e.getMessage() + " " + command.getMove().toString());
+            sendError(session, new Error("Error: invalid move (you might need to specify a promotion piece)"));
+        } catch (Exception e) {
+            sendError(session, new Error("Error: invalid game"));
+        }
+    }
+
+    private void handleLeave(Session session, Leave command) throws IOException {
+        try {
+            AuthData auth = userService.getAuth(command.getAuthToken());
+
+            Notification notif = new Notification("%s has left the game".formatted(auth.username()));
+            broadcastMessage(session, notif);
+
+            session.close();
+        } catch (RuntimeException e) {
+            sendError(session, new Error("Error: Not authorized"));
+        }
+    }
+
+    private void handleResign(Session session, Resign command) throws Exception {
+        try {
+            AuthData auth = userService.getAuth(command.getAuthToken());
+            GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
+            ChessGame.TeamColor userColor = getTeamColor(auth.username(), game);
+
+            String opponentUsername = userColor == ChessGame.TeamColor.WHITE ? game.blackUsername() : game.whiteUsername();
+
+            if (userColor == null) {
+                sendError(session, new Error("Error: You are observing this game"));
+                return;
+            }
+
+            if (game.game().getGameOver()) {
+                sendError(session, new Error("Error: The game is already over!"));
+                return;
+            }
+
+            game.game().setGameOver(true);
+            gameService.updateGame(auth.authToken(), game);
+            Notification notif = new Notification("%s has forfeited, %s wins!".formatted(auth.username(), opponentUsername));
+            broadcastMessage(session, notif, true);
+        } catch (RuntimeException e) {
+            sendError(session, new Error("Error: Not authorized"));
+        } catch (Exception e) {
+            sendError(session, new Error("Error: invalid game"));
+        }
+    }
+
     public void sendMessage(Session session, ServerMessage message) throws IOException {
         session.getRemote().sendString(new Gson().toJson(message));
     }
@@ -159,4 +258,13 @@ public class WebSocketHandler {
         else return null;
     }
 
+}
+
+class InvalidMoveException extends Exception {
+
+    public InvalidMoveException() {}
+
+    public InvalidMoveException(String message) {
+        super(message);
+    }
 }

@@ -110,6 +110,20 @@ public class GameService {
         }
     }
 
+    public void updateGame(String authToken, GameData gameData) throws RuntimeException {
+        try {
+            authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+        try {
+            gameDAO.updateGame(gameData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public void clear(){
         gameDAO.clear();
     }
