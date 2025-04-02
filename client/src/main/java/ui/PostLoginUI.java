@@ -13,6 +13,7 @@ public class PostLoginUI {
     private final ServerFacade server;
     private final Scanner scanner = new Scanner(System.in);
     private Map<Integer, GameData> games;
+    private boolean inGame = false;
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -102,10 +103,13 @@ public class PostLoginUI {
             }
 
             if (server.joinGame(gameID, color)) {
-                out.println("You have joined the game as " + color);
-                new BoardPrinter(games.get(gameID).game().getBoard()).printBoard(
-                        color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK
-                );
+                out.println("You have joined the game");
+                inGame = true;
+                server.connectWS();
+                ChessGame.TeamColor teamColor = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                server.connect(gameID, teamColor);
+                GamePlayUI gameplayUI = new GamePlayUI(server, games.get(gameID), teamColor);
+                gameplayUI.run();
             } else {
                 out.println("Game does not exist or color is already taken.");
             }
