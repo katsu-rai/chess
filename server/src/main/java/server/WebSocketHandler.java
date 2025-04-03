@@ -2,7 +2,6 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -237,6 +236,17 @@ class InvalidMoveException extends Exception {
     public InvalidMoveException() {}
 
     public InvalidMoveException(String message) {
+        super(message);
+    }
+}
+
+class UnauthorizedException extends Exception {
+    public UnauthorizedException() {
+    }
+}
+
+class BadRequestException extends Exception {
+    public BadRequestException(String message) {
         super(message);
     }
 }
