@@ -24,6 +24,7 @@ public class GamePlayUI {
 
     public void run() {
         boolean inGame = true;
+        boardPrinter.printBoard(color, null);
 
         while (inGame) {
             printHelpMenu();
@@ -38,9 +39,8 @@ public class GamePlayUI {
                     continue;
 
                 case "leave":
-                    inGame = false;
                     server.leave(gameID);
-                    break;
+                    return;
 
                 case "move":
                     handleMakeMove(input);
@@ -59,12 +59,10 @@ public class GamePlayUI {
                 }
             }
         }
-
-        new PostLoginUI(server).run();
     }
 
     private String[] getUserInput() {
-        out.printf("\n[IN-GAME] >>> ");
+        out.print("\n[IN-GAME] >>> ");
         return new Scanner(System.in).nextLine().split(" ");
     }
 
@@ -80,6 +78,11 @@ public class GamePlayUI {
     }
 
     private void redraw() {
+        GameData updatedGameData = server.getGameData(gameID);
+        ChessGame updatedGame = updatedGameData.game();
+
+        boardPrinter = new BoardPrinter(updatedGame);
+
         boardPrinter.printBoard(color, null);
     }
 
@@ -112,6 +115,20 @@ public class GamePlayUI {
                 return;
             }
             server.makeMove(gameID, new ChessMove(from, to, promotion));
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            GameData updatedGameData = server.getGameData(gameID);
+            ChessGame updatedGame = updatedGameData.game();
+
+            // Update the board printer with the updated game state
+            boardPrinter = new BoardPrinter(updatedGame);
+
+            boardPrinter.printBoard(color, null);
         } else {
             out.println("Invalid move format. Use: move <from> <to> <promotion_piece>");
         }

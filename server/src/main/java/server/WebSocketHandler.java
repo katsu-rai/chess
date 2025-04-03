@@ -116,13 +116,14 @@ public class WebSocketHandler {
             AuthData auth = userService.getAuth(command.getAuthToken());
             GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
             ChessGame.TeamColor userColor = getTeamColor(auth.username(), game);
+
             if (userColor == null) {
                 sendError(session, new Error("You are observing this game"));
                 return;
             }
 
             if (game.game().getGameOver()) {
-                sendError(session, new Error("can not make a move, game is over"));
+                sendError(session, new Error("Game is over, cannot make a move"));
                 return;
             }
 
@@ -141,31 +142,29 @@ public class WebSocketHandler {
                     game.game().setGameOver(true);
                 }
                 else if (game.game().isInCheck(opponentColor)) {
-                    notif = new Notification("A move has been made by %s, %s is now in check!".formatted(auth.username(), opponentColor.toString()));
+                    notif = new Notification("A move has been made by %s, %s is now in check!".formatted(auth.username(), opponentColor));
                 }
                 else {
                     notif = new Notification("A move has been made by %s".formatted(auth.username()));
                 }
-                broadcastMessage(session, notif);
 
+                broadcastMessage(session, notif);
                 gameService.updateGame(auth.authToken(), game);
 
                 LoadGame load = new LoadGame(game.game());
                 broadcastMessage(session, load, true);
+            } else {
+                sendError(session, new Error("It is not your turn"));
             }
-            else {
-                sendError(session, new Error("it is not your turn"));
-            }
-        }
-        catch (UnauthorizedException e) {
+        } catch (UnauthorizedException e) {
             sendError(session, new Error("Not authorized"));
         } catch (InvalidMoveException e) {
-            System.out.println(e.getMessage() + " " + command.getMove().toString());
-            sendError(session, new Error("invalid move (you might need to specify a promotion piece)"));
+            sendError(session, new Error("Invalid move (you might need to specify a promotion piece)"));
         } catch (Exception e) {
-            sendError(session, new Error("invalid game"));
+            sendError(session, new Error("Invalid game state"));
         }
     }
+
 
     private void handleLeave(Session session, Leave command) throws Exception {
         try {
@@ -255,11 +254,6 @@ public class WebSocketHandler {
 
 class InvalidMoveException extends Exception {
 
-    public InvalidMoveException() {}
-
-    public InvalidMoveException(String message) {
-        super(message);
-    }
 }
 
 class UnauthorizedException extends Exception {

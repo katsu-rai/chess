@@ -138,6 +138,36 @@ public class ServerFacade {
         }
     }
 
+    public GameData getGameData(int gameID) {
+        // Fetch all games data
+        Map<String, Object> resp = request("GET", "/game", null);
+
+        if (resp.containsKey("Error")) {
+            System.err.println("Failed to get games data. Server response: " + resp);
+            return null;
+        }
+
+        List<Map<String, Object>> gameList = (List<Map<String, Object>>) resp.get("games");
+
+        for (Map<String, Object> gameDataMap : gameList) {
+            int currentGameID = ((Number) gameDataMap.get("gameID")).intValue();
+            if (currentGameID == gameID) {
+                String gameJson = new Gson().toJson(gameDataMap.get("game"));
+                ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+
+                String gameName = (String) gameDataMap.get("gameName");
+                String whiteUser = (String) gameDataMap.getOrDefault("whiteUsername", null);
+                String blackUser = (String) gameDataMap.getOrDefault("blackUsername", null);
+
+                return new GameData(gameID, whiteUser, blackUser, gameName, game);
+            }
+        }
+
+        System.err.println("Game with ID " + gameID + " not found.");
+        return null;
+    }
+
+
     public void connectWS() {
         try {
             ws = new WebSocketCommunicator(baseURL);
