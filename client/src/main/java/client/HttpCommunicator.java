@@ -66,7 +66,9 @@ public class HttpCommunicator {
     private Map<String, Object> request(String method, String endpoint, Map<String, Object> body) {
         try {
             HttpURLConnection http = makeConnection(method, endpoint, body);
-            if (http.getResponseCode() == 401) return null;
+            if (http.getResponseCode() == 401) {
+                return null;
+            }
             try (InputStream respBody = http.getInputStream()) {
                 return new Gson().fromJson(new InputStreamReader(respBody), Map.class);
             }
@@ -100,7 +102,9 @@ public class HttpCommunicator {
     private String requestString(String method, String endpoint, Map<String, Object> body) {
         try {
             HttpURLConnection http = makeConnection(method, endpoint, body);
-            if (http.getResponseCode() == 401) return "Error: 401";
+            if (http.getResponseCode() == 401){
+                return "Error: 401";
+            }
             try (InputStream respBody = http.getInputStream()) {
                 return new String(respBody.readAllBytes());
             }

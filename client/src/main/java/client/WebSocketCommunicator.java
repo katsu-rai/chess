@@ -59,9 +59,16 @@ public class WebSocketCommunicator extends Endpoint {
     }
 
     private ServerMessage.ServerMessageType extractMessageType(String message) {
-        if (message.contains("\"serverMessageType\":\"NOTIFICATION\"")) return ServerMessage.ServerMessageType.NOTIFICATION;
-        if (message.contains("\"serverMessageType\":\"ERROR\"")) return ServerMessage.ServerMessageType.ERROR;
-        if (message.contains("\"serverMessageType\":\"LOAD_GAME\"")) return ServerMessage.ServerMessageType.LOAD_GAME;
+        if (message.contains("\"serverMessageType\":\"NOTIFICATION\"")) {
+            return ServerMessage.ServerMessageType.NOTIFICATION;
+
+        } else if (message.contains("\"serverMessageType\":\"ERROR\"")) {
+            return ServerMessage.ServerMessageType.ERROR;
+
+        } else if (message.contains("\"serverMessageType\":\"LOAD_GAME\"")) {
+            return ServerMessage.ServerMessageType.LOAD_GAME;
+        }
+
         return null;
     }
 

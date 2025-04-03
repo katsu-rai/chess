@@ -78,7 +78,8 @@ public class WebSocketHandler {
         }
 
         // Notify players of the connection
-        Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor() != null ? command.getColor().toString() : "Observer"));
+        Notification notif = new Notification("%s has joined the game as %s".
+                formatted(auth.username(), command.getColor() != null ? command.getColor().toString() : "Observer"));
         broadcastMessage(session, notif);
 
         // Load the game and send it to the client
@@ -245,7 +246,9 @@ public class WebSocketHandler {
         else if (username.equals(game.blackUsername())) {
             return ChessGame.TeamColor.BLACK;
         }
-        else return null;
+        else {
+            return null;
+        }
     }
 
 }
