@@ -154,8 +154,8 @@ public class ServerFacade {
         ws.sendMessage(new Gson().toJson(command));
     }
 
-    public void connect(int gameID, ChessGame.TeamColor color) {
-        sendCommand(new Connect(authToken, gameID, color));
+    public void connect(int gameID) {
+        sendCommand(new Connect(authToken, gameID));
     }
 
     public void makeMove(int gameID, ChessMove move) {

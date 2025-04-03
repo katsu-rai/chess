@@ -11,18 +11,22 @@ import websocket.messages.*;
 
 
 import java.io.IOException;
-import java.util.Objects;
+import java.lang.Error;
 
 @WebSocket
 public class WebSocketHandler {
+    private static GameService gameService;
+    private static UserService userService;
 
-    private final GameService gameService;
-    private final UserService userService;
-
-    public WebSocketHandler(GameService gameService, UserService userService) {
-        this.gameService = gameService;
-        this.userService = userService;
+    public static void initializer(UserService userServiceParam, GameService gameServiceParam) {
+        userService = userServiceParam;
+        gameService = gameServiceParam;
     }
+
+
+    public WebSocketHandler() {
+    }
+
 
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
@@ -39,25 +43,20 @@ public class WebSocketHandler {
 
         System.out.printf("Received: %s\n", message);
 
-        if (message.contains("\"commandType\":\"CONNECT\"")) {
+        if (message.contains("CONNECT")) {
             Connect command = new Gson().fromJson(message, Connect.class);
             Server.gameSessions.replace(session, command.getGameID());
             handlePlayerConnect(session, command);
         }
-//        else if (message.contains("\"commandType\":\"JOIN_OBSERVER\"")) {
-//            Connect command = new Gson().fromJson(message, Connect.class);
-//            Server.gameSessions.replace(session, command.getGameID());
-//            handleObserverConnect(session, command);
-//        }
-        else if (message.contains("\"commandType\":\"MAKE_MOVE\"")) {
+        else if (message.contains("MAKE_MOVE")) {
             MakeMove command = new Gson().fromJson(message, MakeMove.class);
             handleMakeMove(session, command);
         }
-        else if (message.contains("\"commandType\":\"LEAVE\"")) {
+        else if (message.contains("LEAVE")) {
             Leave command = new Gson().fromJson(message, Leave.class);
             handleLeave(session, command);
         }
-        else if (message.contains("\"commandType\":\"RESIGN\"")) {
+        else if (message.contains("RESIGN")) {
             Resign command = new Gson().fromJson(message, Resign.class);
             handleResign(session, command);
         }
@@ -69,23 +68,7 @@ public class WebSocketHandler {
             AuthData auth = userService.getAuth(command.getAuthToken());
             GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
 
-            ChessGame.TeamColor joiningColor = command.getColor().toString().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-
-            boolean correctColor;
-            if (joiningColor == ChessGame.TeamColor.WHITE) {
-                correctColor = Objects.equals(game.whiteUsername(), auth.username());
-            }
-            else {
-                correctColor = Objects.equals(game.blackUsername(), auth.username());
-            }
-
-            if (!correctColor) {
-                Error error = new Error("Error: attempting to join with wrong color");
-                sendError(session, error);
-                return;
-            }
-
-            Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor().toString()));
+            Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor() != null ? command.getColor().toString() : "Observer"));
             broadcastMessage(session, notif);
 
             LoadGame load = new LoadGame(game.game());
@@ -244,8 +227,7 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, Error error) throws IOException {
-        System.out.printf("Error: %s%n", new Gson().toJson(error));
-        session.getRemote().sendString(new Gson().toJson(error));
+        session.getRemote().sendString(error.getMessage());
     }
 
     private ChessGame.TeamColor getTeamColor(String username, GameData game) {

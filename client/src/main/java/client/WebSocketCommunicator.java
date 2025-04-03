@@ -2,11 +2,9 @@ package client;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import ui.BoardPrinter;
-import ui.GamePlayUI;
 
-import websocket.commands.*;
 import websocket.messages.*;
+import websocket.messages.Error;
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -21,12 +19,22 @@ public class WebSocketCommunicator extends Endpoint {
 
     public WebSocketCommunicator(String serverDomain) throws Exception {
         try {
-            URI uri = new URI("ws://" + serverDomain + "/connect");
+            if (serverDomain.startsWith("https://")) {
+                serverDomain = serverDomain.replaceFirst("https://", "wss://");
+            } else if (serverDomain.startsWith("http://")) {
+                serverDomain = serverDomain.replaceFirst("http://", "ws://");
+            } else if (serverDomain.startsWith("localhost:8080//")) {
+                serverDomain = serverDomain.replaceFirst("localhost:8080//", "ws://");
+            } else if (!serverDomain.startsWith("ws://") && !serverDomain.startsWith("wss://")) {
+                serverDomain = "ws://" + serverDomain;
+            }
+
+            URI uri = new URI(serverDomain + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
             this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleMessage);
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new Exception("Failed to connect to WebSocket: " + ex.getMessage(), ex);
+            throw new WebSocketConnectionException("Failed to connect to WebSocket: " + ex.getMessage(), ex);
         }
     }
 
@@ -44,7 +52,7 @@ public class WebSocketCommunicator extends Endpoint {
 
         switch (messageType) {
             case NOTIFICATION -> printNotification(GSON.fromJson(message, Notification.class).getNotifiMessage());
-            case ERROR -> printNotification(GSON.fromJson(message, Error.class).getMessage());
+            case ERROR -> printNotification(GSON.fromJson(message, Error.class).getErrorMessage());
             case LOAD_GAME -> printLoadedGame(GSON.fromJson(message, LoadGame.class).game());
             default -> System.err.println("Unhandled message type: " + messageType);
         }
@@ -77,3 +85,4 @@ public class WebSocketCommunicator extends Endpoint {
         session.getAsyncRemote().sendText(message);
     }
 }
+

@@ -24,23 +24,33 @@ public class GamePlayUI {
 
     public void run() {
         boolean inGame = true;
-        out.print(RESET_TEXT_COLOR + RESET_BG_COLOR);
 
         while (inGame) {
+            printHelpMenu();
             String[] input = getUserInput();
+
             switch (input[0]) {
-                case "help" -> printHelpMenu();
-                case "redraw" -> redraw();
-                case "leave" -> {
+                case "help":
+                    continue;
+
+                case "redraw":
+                    redraw();
+
+                case "leave":
                     inGame = false;
                     server.leave(gameID);
-                }
-                case "move" -> handleMakeMove(input);
-                case "resign" -> handleResign();
-                case "highlight" -> handleHighlight(input);
-                default -> {
+
+                case "move":
+                    handleMakeMove(input);
+
+                case "resign":
+                    handleResign();
+
+                case "highlight":
+                    handleHighlight(input);
+
+                default: {
                     out.println("Command not recognized, please try again");
-                    printHelpMenu();
                 }
             }
         }
@@ -54,12 +64,13 @@ public class GamePlayUI {
     }
 
     private void printHelpMenu() {
-        out.println("redraw - redraw the game board");
-        out.println("leave - leave the current game");
-        out.println("move <from> <to> <promotion_piece> - make a move (only for pawn promotion)");
-        out.println("resign - forfeit this game");
-        out.println("highlight <coordinate> - highlight all legal moves for the given piece");
-        out.println("help - show this menu");
+        out.println(SET_TEXT_COLOR_YELLOW + "\nAvailable Commands:" + RESET_TEXT_COLOR);
+        out.println(SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - Redraw the game board");
+        out.println(SET_TEXT_COLOR_BLUE + "move <FROM> <TO> <PROMOTION PIECE>" + RESET_TEXT_COLOR + " - Make a move (only for pawn promotion)");
+        out.println(SET_TEXT_COLOR_BLUE + "highlight <COORDINATE>" + RESET_TEXT_COLOR + " - Highlight all legal moves for the given piece");
+        out.println(SET_TEXT_COLOR_RED + "leave" + RESET_TEXT_COLOR + " - Leave the current game");
+        out.println(SET_TEXT_COLOR_RED + "resign" + RESET_TEXT_COLOR + " - Forfeit this game");
+        out.println(SET_TEXT_COLOR_GREEN + "help" + RESET_TEXT_COLOR + " - Show this menu");
     }
 
     private void redraw() {
@@ -67,7 +78,7 @@ public class GamePlayUI {
     }
 
     private void handleResign() {
-        out.println("Are you sure you want to forfeit? (yes/no)");
+        out.println("Are you sure you want to give up? (yes/no)");
         if (getUserInput()[0].equalsIgnoreCase("yes")) {
             server.resign(gameID);
         } else {

@@ -107,7 +107,7 @@ public class PostLoginUI {
                 inGame = true;
                 server.connectWS();
                 ChessGame.TeamColor teamColor = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-                server.connect(gameID, teamColor);
+                server.connect(gameID);
                 GamePlayUI gameplayUI = new GamePlayUI(server, games.get(gameID), teamColor);
                 gameplayUI.run();
             } else {
@@ -124,7 +124,7 @@ public class PostLoginUI {
             return;
         }
 
-        games = server.listGamesMap(); // Refresh game list
+        games = server.listGamesMap();
 
         try {
             int gameID = Integer.parseInt(input[1]);
@@ -152,6 +152,5 @@ public class PostLoginUI {
         out.println(SET_TEXT_COLOR_RED + "logout" + RESET_TEXT_COLOR + " - Log out of current user");
         out.println(SET_TEXT_COLOR_RED + "quit" + RESET_TEXT_COLOR + " - Stop playing");
         out.println(SET_TEXT_COLOR_GREEN + "help" + RESET_TEXT_COLOR + " - Show this menu");
-
     }
 }
