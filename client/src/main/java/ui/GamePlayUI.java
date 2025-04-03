@@ -19,7 +19,7 @@ public class GamePlayUI {
         ChessGame game = gameData.game();
         this.gameID = gameData.gameID();
         GamePlayUI.color = color;
-        boardPrinter = new BoardPrinter(game.getBoard());
+        boardPrinter = new BoardPrinter(game);
     }
 
     public void run() {
@@ -40,7 +40,7 @@ public class GamePlayUI {
                 case "leave":
                     inGame = false;
                     server.leave(gameID);
-                    continue;
+                    break;
 
                 case "move":
                     handleMakeMove(input);
@@ -48,9 +48,11 @@ public class GamePlayUI {
 
                 case "resign":
                     handleResign();
+                    break;
 
                 case "highlight":
                     handleHighlight(input);
+                    continue;
 
                 default: {
                     out.println("Command not recognized, please try again");
@@ -77,7 +79,7 @@ public class GamePlayUI {
     }
 
     private void redraw() {
-        boardPrinter.printBoard(color);
+        boardPrinter.printBoard(color, null);
     }
 
     private void handleResign() {
@@ -92,7 +94,7 @@ public class GamePlayUI {
     private void handleHighlight(String[] input) {
         if (input.length == 2 && input[1].matches("[a-h][1-8]")) {
             ChessPosition position = new ChessPosition(input[1].charAt(1) - '0', input[1].charAt(0) - ('a' - 1));
-            boardPrinter.printBoard(color);
+            boardPrinter.printBoard(color, position);
         } else {
             out.println("Please provide a valid coordinate (e.g., 'a2')");
         }

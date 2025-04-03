@@ -136,7 +136,7 @@ public class PostLoginUI {
             }
 
             out.println("Observing game: " + gameData.gameName());
-            new BoardPrinter(gameData.game().getBoard()).printBoard(ChessGame.TeamColor.WHITE);
+            new BoardPrinter(gameData.game()).printBoard(ChessGame.TeamColor.WHITE, null);
         } catch (NumberFormatException e) {
             out.println("Invalid game ID format. Please enter a valid number.");
         }
