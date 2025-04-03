@@ -116,12 +116,12 @@ public class WebSocketHandler {
             GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
             ChessGame.TeamColor userColor = getTeamColor(auth.username(), game);
             if (userColor == null) {
-                sendError(session, new Error("Error: You are observing this game"));
+                sendError(session, new Error("You are observing this game"));
                 return;
             }
 
             if (game.game().getGameOver()) {
-                sendError(session, new Error("Error: can not make a move, game is over"));
+                sendError(session, new Error("can not make a move, game is over"));
                 return;
             }
 
@@ -153,29 +153,48 @@ public class WebSocketHandler {
                 broadcastMessage(session, load, true);
             }
             else {
-                sendError(session, new Error("Error: it is not your turn"));
+                sendError(session, new Error("it is not your turn"));
             }
         }
         catch (UnauthorizedException e) {
-            sendError(session, new Error("Error: Not authorized"));
+            sendError(session, new Error("Not authorized"));
         } catch (InvalidMoveException e) {
-            System.out.println("****** error: " + e.getMessage() + " " + command.getMove().toString());
-            sendError(session, new Error("Error: invalid move (you might need to specify a promotion piece)"));
+            System.out.println(e.getMessage() + " " + command.getMove().toString());
+            sendError(session, new Error("invalid move (you might need to specify a promotion piece)"));
         } catch (Exception e) {
-            sendError(session, new Error("Error: invalid game"));
+            sendError(session, new Error("invalid game"));
         }
     }
 
-    private void handleLeave(Session session, Leave command) throws IOException {
+    private void handleLeave(Session session, Leave command) throws Exception {
         try {
             AuthData auth = userService.getAuth(command.getAuthToken());
+            GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
+
+            ChessGame.TeamColor userColor = getTeamColor(auth.username(), game);
+            if (userColor == null) {
+                Notification notif = new Notification("%s has left the game".formatted(auth.username()));
+                broadcastMessage(session, notif);
+
+                session.close();
+                return;
+            }
+
+            GameData updatedGame = game;
+            if (userColor == ChessGame.TeamColor.WHITE) {
+                updatedGame = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+            } else if (userColor == ChessGame.TeamColor.BLACK) {
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            }
+
+            gameService.updateGame(auth.authToken(), updatedGame);
 
             Notification notif = new Notification("%s has left the game".formatted(auth.username()));
             broadcastMessage(session, notif);
 
             session.close();
         } catch (RuntimeException e) {
-            sendError(session, new Error("Error: Not authorized"));
+            sendError(session, new Error("Not authorized"));
         }
     }
 
@@ -188,12 +207,12 @@ public class WebSocketHandler {
             String opponentUsername = userColor == ChessGame.TeamColor.WHITE ? game.blackUsername() : game.whiteUsername();
 
             if (userColor == null) {
-                sendError(session, new Error("Error: You are observing this game"));
+                sendError(session, new Error(" You are observing this game"));
                 return;
             }
 
             if (game.game().getGameOver()) {
-                sendError(session, new Error("Error: The game is already over!"));
+                sendError(session, new Error("The game is already over!"));
                 return;
             }
 
