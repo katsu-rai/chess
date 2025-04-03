@@ -43,23 +43,36 @@ public class GamePlayUI {
                     return;
 
                 case "move":
+                    if (color == null) {
+                        out.println("Observers cannot make moves.");
+                        continue;
+                    }
                     handleMakeMove(input);
                     continue;
 
                 case "resign":
+                    if (color == null) {
+                        out.println("Observers cannot resign.");
+                        continue;
+                    }
                     handleResign();
                     break;
 
                 case "highlight":
+                    if (color == null) {
+                        out.println("Observers cannot highlight moves.");
+                        continue;
+                    }
                     handleHighlight(input);
                     continue;
 
                 default: {
-                    out.println("Command not recognized, please try again");
+                    out.println("Command not recognized, please try again.");
                 }
             }
         }
     }
+
 
     private String[] getUserInput() {
         out.print("\n[IN-GAME] >>> ");

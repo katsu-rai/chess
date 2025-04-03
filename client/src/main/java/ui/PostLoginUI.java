@@ -136,11 +136,21 @@ public class PostLoginUI {
             }
 
             out.println("Observing game: " + gameData.gameName());
-            new BoardPrinter(gameData.game()).printBoard(ChessGame.TeamColor.WHITE, null);
+
+            server.connectWS();
+            server.connect(gameID);
+
+            BoardPrinter boardPrinter = new BoardPrinter(gameData.game());
+            boardPrinter.printBoard(ChessGame.TeamColor.WHITE, null);
+
+            GamePlayUI gameplayUI = new GamePlayUI(server, games.get(gameID), null);
+            gameplayUI.run();
+
         } catch (NumberFormatException e) {
             out.println("Invalid game ID format. Please enter a valid number.");
         }
     }
+
 
 
     private void printHelpMenu() {
