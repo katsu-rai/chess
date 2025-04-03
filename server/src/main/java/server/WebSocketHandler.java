@@ -2,16 +2,17 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.*;
 import service.*;
 import websocket.messages.*;
+import websocket.messages.Error;
 
 
 import java.io.IOException;
-import java.lang.Error;
 
 @WebSocket
 public class WebSocketHandler {
@@ -63,41 +64,27 @@ public class WebSocketHandler {
     }
 
     private void handlePlayerConnect(Session session, Connect command) throws Exception {
-
-        try {
-            AuthData auth = userService.getAuth(command.getAuthToken());
-            GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
-
-            Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor() != null ? command.getColor().toString() : "Observer"));
-            broadcastMessage(session, notif);
-
-            LoadGame load = new LoadGame(game.game());
-            sendMessage(session, load);
-        } catch (RuntimeException e) {
-            sendError(session, new Error("Error: Not authorized"));
-        } catch (Exception e) {
-            sendError(session, new Error("Error: Not a valid game"));
+        AuthData auth = userService.getAuth(command.getAuthToken());
+        if (auth == null) {
+            // Send a structured JSON error message instead of just a string
+            sendError(session, new Error("Invalid AuthToken"));
+            return;
         }
 
-    }
-
-    private void handleObserverConnect(Session session, Connect command) throws Exception {
-        try {
-            AuthData auth = userService.getAuth(command.getAuthToken());
-            GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
-
-            Notification notif = new Notification("%s has joined the game as an observer".formatted(auth.username()));
-            broadcastMessage(session, notif);
-
-            LoadGame load = new LoadGame(game.game());
-            sendMessage(session, load);
+        GameData game = gameService.getGameData(command.getAuthToken(), command.getGameID());
+        if (game == null) {
+            // Send a structured JSON error message instead of just a string
+            sendError(session, new Error("Invalid Game ID"));
+            return;
         }
-        catch (RuntimeException e) {
-            sendError(session, new Error("Error: Not authorized"));
 
-        } catch (Exception e) {
-            sendError(session, new Error("Error: Not a valid game"));
-        }
+        // Notify players of the connection
+        Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor() != null ? command.getColor().toString() : "Observer"));
+        broadcastMessage(session, notif);
+
+        // Load the game and send it to the client
+        LoadGame load = new LoadGame(game.game());
+        sendMessage(session, load);
     }
 
 
@@ -170,7 +157,7 @@ public class WebSocketHandler {
                 sendError(session, new Error("Error: it is not your turn"));
             }
         }
-        catch (RuntimeException e) {
+        catch (UnauthorizedException e) {
             sendError(session, new Error("Error: Not authorized"));
         } catch (InvalidMoveException e) {
             System.out.println("****** error: " + e.getMessage() + " " + command.getMove().toString());
@@ -215,10 +202,10 @@ public class WebSocketHandler {
             gameService.updateGame(auth.authToken(), game);
             Notification notif = new Notification("%s has forfeited, %s wins!".formatted(auth.username(), opponentUsername));
             broadcastMessage(session, notif, true);
-        } catch (RuntimeException e) {
-            sendError(session, new Error("Error: Not authorized"));
-        } catch (Exception e) {
-            sendError(session, new Error("Error: invalid game"));
+        } catch (UnauthorizedException e) {
+            sendError(session, new Error("Unauthorized"));
+        } catch (BadRequestException e) {
+            sendError(session, new Error("BadRequest"));
         }
     }
 
@@ -227,8 +214,11 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, Error error) throws IOException {
-        session.getRemote().sendString(error.getMessage());
+        Gson gson = new Gson();
+        String json = gson.toJson(error);
+        session.getRemote().sendString(json);
     }
+
 
     private ChessGame.TeamColor getTeamColor(String username, GameData game) {
         if (username.equals(game.whiteUsername())) {

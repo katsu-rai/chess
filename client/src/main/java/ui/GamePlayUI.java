@@ -71,7 +71,8 @@ public class GamePlayUI {
     private void printHelpMenu() {
         out.println(SET_TEXT_COLOR_YELLOW + "\nAvailable Commands:" + RESET_TEXT_COLOR);
         out.println(SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - Redraw the game board");
-        out.println(SET_TEXT_COLOR_BLUE + "move <FROM> <TO> <PROMOTION PIECE>" + RESET_TEXT_COLOR + " - Make a move (only for pawn promotion)");
+        out.println(SET_TEXT_COLOR_BLUE + "move <FROM> <TO> <PROMOTION PIECE>" + RESET_TEXT_COLOR +
+                " - Make a move (<PROMOTION PIECE> only for pawn promotion)");
         out.println(SET_TEXT_COLOR_BLUE + "highlight <COORDINATE>" + RESET_TEXT_COLOR + " - Highlight all legal moves for the given piece");
         out.println(SET_TEXT_COLOR_RED + "leave" + RESET_TEXT_COLOR + " - Leave the current game");
         out.println(SET_TEXT_COLOR_RED + "resign" + RESET_TEXT_COLOR + " - Forfeit this game");

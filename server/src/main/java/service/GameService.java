@@ -100,13 +100,13 @@ public class GameService {
         try {
             authDAO.getAuth(authToken);
         } catch (DataAccessException e) {
-            throw new Exception(e.getMessage());
+            return null;
         }
 
         try {
             return gameDAO.getGame(gameID);
         } catch (DataAccessException e) {
-            throw new Exception(e.getMessage());
+            return null;
         }
     }
 

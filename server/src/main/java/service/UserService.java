@@ -69,7 +69,7 @@ public class UserService {
         try {
             return authDAO.getAuth(authToken);
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 }
