@@ -35,13 +35,16 @@ public class GamePlayUI {
 
                 case "redraw":
                     redraw();
+                    continue;
 
                 case "leave":
                     inGame = false;
                     server.leave(gameID);
+                    continue;
 
                 case "move":
                     handleMakeMove(input);
+                    continue;
 
                 case "resign":
                     handleResign();
@@ -88,10 +91,10 @@ public class GamePlayUI {
 
     private void handleHighlight(String[] input) {
         if (input.length == 2 && input[1].matches("[a-h][1-8]")) {
-//            ChessPosition position = new ChessPosition(input[1].charAt(1) - '0', input[1].charAt(0) - ('a' - 1));
+            ChessPosition position = new ChessPosition(input[1].charAt(1) - '0', input[1].charAt(0) - ('a' - 1));
             boardPrinter.printBoard(color);
         } else {
-            out.println("Please provide a valid coordinate (e.g., 'c3')");
+            out.println("Please provide a valid coordinate (e.g., 'a2')");
         }
     }
 
